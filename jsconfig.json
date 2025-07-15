@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["es2020", "dom"]   // 👈 Fixes the 'Promise' and browser globals
+  },
+  "exclude": ["node_modules", "dist"]
+}
