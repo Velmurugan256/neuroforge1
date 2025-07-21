@@ -138,7 +138,7 @@ export default function RightPanelContainer() {
   /* ─────────────────── render ─────────────────── */
   return (
     <div className="w-full h-full bg-slate-950 text-white border-l border-slate-800/50 overflow-y-auto">
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -215,7 +215,7 @@ export default function RightPanelContainer() {
                 {/* NeuroSync */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-3">
                   <button
-                    className="bg-cyan-600 hover:bg-cyan-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
+                    className="bg-cyan-600 hover:bg-cyan-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                     onClick={handleNeuroSync}
                     disabled={syncTargets.length === 0 || syncing}
                   >
@@ -236,7 +236,7 @@ export default function RightPanelContainer() {
                 {/* NeuroWipe */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <button
-                    className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
+                    className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
                     onClick={handleNeuroWipe}
                     disabled={wipeTargets.length === 0 || wiping}
                   >
@@ -267,10 +267,10 @@ export default function RightPanelContainer() {
                 {activity.length === 0 && <div className="text-slate-500 text-center py-4">No activity yet.</div>}
                 {activity.map((it, idx) => (
                   <div key={idx} className="bg-slate-800/50 rounded-lg p-3 border border-slate-800">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-slate-400 text-xs">{it.last_modified ?? it.time}</div>
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <div className="text-slate-400 text-xs flex-shrink-0">{it.last_modified ?? it.time}</div>
                       <div
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
                           it.status === "learned"
                             ? "bg-emerald-500/20 text-emerald-400"
                             : it.status === "failed"
@@ -281,7 +281,7 @@ export default function RightPanelContainer() {
                         {it.status}
                       </div>
                     </div>
-                    <div className="text-slate-200 text-sm truncate" title={it.document_id}>
+                    <div className="text-slate-200 text-sm truncate min-w-0" title={it.document_id}>
                       {it.document_id}
                     </div>
                   </div>

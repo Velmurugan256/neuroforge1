@@ -2,14 +2,15 @@
 
 import { UserCircle, LogOut } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
 
 const HeaderBar = () => {
   const { user, signOut } = useAuth()
-  // The user object is now the decoded ID token payload from Cognito
+  const isMobile = useMediaQuery("(max-width: 768px)")
   const username = user?.email || user?.["cognito:username"] || "Authenticated User"
 
   return (
-    <header className="bg-slate-950/80 backdrop-blur-sm px-6 py-3 flex justify-between items-center border-b border-slate-800/50 h-16">
+    <header className="bg-slate-950/80 backdrop-blur-sm px-4 sm:px-6 py-3 flex justify-between items-center border-b border-slate-800/50 h-16 flex-shrink-0">
       {/* Left Side: Logo and Title */}
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20">
@@ -23,10 +24,10 @@ const HeaderBar = () => {
       </div>
 
       {/* Right Side: User Info / Sign Out */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
           <UserCircle className="w-5 h-5 text-cyan-400" />
-          <span className="text-sm font-medium text-slate-300">{username}</span>
+          {!isMobile && <span className="text-sm font-medium text-slate-300">{username}</span>}
         </div>
         <button
           onClick={signOut}
