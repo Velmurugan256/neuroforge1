@@ -71,7 +71,7 @@ export default function MultiDocumentDropdown({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="flex items-center justify-between w-48 h-9 bg-gray-700 text-white px-3 rounded disabled:opacity-50"
+          className="flex items-center justify-between w-full h-9 bg-gray-700 text-white px-3 rounded disabled:opacity-50"
           disabled={disabled}
         >
           <span className="truncate">{summary}</span>

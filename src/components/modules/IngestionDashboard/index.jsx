@@ -122,14 +122,14 @@ export default function RightPanelContainer() {
 
   /* ─────────────────── stat component helper ─────────────────── */
   const StatCard = ({ icon: Icon, label, value, color = "text-slate-300", bgColor = "bg-slate-800/50" }) => (
-    <div className={`${bgColor} rounded-xl p-4 border border-slate-800`}>
+    <div className={`${bgColor} rounded-xl p-4 border border-slate-800 overflow-hidden`}>
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-slate-700/50 rounded-lg">
+        <div className="p-2 bg-slate-700/50 rounded-lg flex-shrink-0">
           <Icon className={`w-5 h-5 ${color}`} />
         </div>
-        <div>
-          <div className="text-slate-400 text-sm font-medium">{label}</div>
-          <div className={`text-lg font-bold ${color}`}>{value}</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-slate-400 text-sm font-medium truncate">{label}</div>
+          <div className={`text-lg font-bold ${color} truncate`}>{String(value)}</div>
         </div>
       </div>
     </div>
@@ -180,7 +180,7 @@ export default function RightPanelContainer() {
         {stats && (
           <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <StatCard icon={() => <span className="text-lg">📁</span>} label="Total" value={stats.totalUploaded} />
               <StatCard
                 icon={() => <span className="text-lg">✅</span>}
@@ -213,7 +213,7 @@ export default function RightPanelContainer() {
                 </h3>
 
                 {/* NeuroSync */}
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-3">
                   <button
                     className="bg-cyan-600 hover:bg-cyan-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                     onClick={handleNeuroSync}
@@ -234,7 +234,7 @@ export default function RightPanelContainer() {
                 </div>
 
                 {/* NeuroWipe */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <button
                     className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
                     onClick={handleNeuroWipe}
