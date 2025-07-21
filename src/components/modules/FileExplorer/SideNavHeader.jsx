@@ -24,7 +24,7 @@ const SideNavHeader = ({ onRefresh, loading, onAddFolder, bucketName = "Explorer
 
         <button
           title="Add Folder"
-          onClick={onAddFolder}
+          onClick={onAddFolder} // 👈 This now opens the modal
           className="group bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-cyan-400 p-2 rounded-lg transition-all duration-200 border border-slate-700/50"
         >
           <FolderPlus className="w-4 h-4 group-hover:scale-110 transition-transform" />

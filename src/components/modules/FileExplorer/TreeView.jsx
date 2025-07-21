@@ -8,8 +8,9 @@ const TreeView = ({
   onRename,
   onDelete,
   onCreateFolder,
-  onUploadFile, // 🔹 NEW prop
-  onRefresh, // 🔹 NEW prop
+  onCreateFile, // 🔹 NEW prop
+  onUploadFile,
+  onRefresh,
   userId,
   userRole,
   onOpenDocument,
@@ -27,6 +28,7 @@ const TreeView = ({
           onRename={onRename}
           onDelete={onDelete}
           onCreateFolder={onCreateFolder}
+          onCreateFile={onCreateFile} // 🔹 Pass down
           onUploadFile={onUploadFile}
           onRefresh={onRefresh}
           userId={userId}
@@ -38,5 +40,4 @@ const TreeView = ({
   </>
 )
 
-// ✅ Export the TreeView component as the default export of this module
 export default TreeView

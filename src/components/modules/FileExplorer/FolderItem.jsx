@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { FilePlus, FolderPlus, Upload, ChevronRight, ChevronDown } from "lucide-react"
+import { FilePlus, FolderPlus, Upload, ChevronRight, ChevronDown, Edit, Trash2, MoreVertical } from "lucide-react"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 
 import CreateFileMenu from "./CreateFileMenu"
@@ -15,6 +15,7 @@ const FolderItem = ({
   onRename,
   onDelete,
   onCreateFolder,
+  onCreateFile, // 👈 Receive new prop
   onUploadFile,
   onRefresh,
   userId,
@@ -26,7 +27,6 @@ const FolderItem = ({
   const [newName, setNewName] = useState(item.name)
   const isSelected = selectedItem === item.path
 
-  /* upload helpers */
   const fileInputRef = useRef(null)
   const handleUploadClick = () => fileInputRef.current?.click()
   const handleFileSelected = async (e) => {
@@ -43,7 +43,6 @@ const FolderItem = ({
     }
   }
 
-  /* helpers */
   const rowBase =
     "group cursor-pointer flex justify-between items-center px-3 py-2 rounded-lg transition-all duration-200"
   const rowActive = isSelected
@@ -57,11 +56,6 @@ const FolderItem = ({
     setIsRenaming(false)
   }
 
-  const createSubfolder = () => {
-    const fn = prompt("Enter subfolder name:")
-    if (fn) onCreateFolder(`${item.path}/${fn}`)
-  }
-
   const toggleFolder = () => {
     setIsOpen(!isOpen)
     onSelect(item.path)
@@ -69,9 +63,7 @@ const FolderItem = ({
 
   return (
     <div className="text-white">
-      {/* ── Folder row ───────────────────────────────────────── */}
       <div className={`${rowBase} ${rowActive}`}>
-        {/* Folder name or rename input */}
         {isRenaming ? (
           <input
             className="bg-slate-800 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -95,14 +87,12 @@ const FolderItem = ({
           </div>
         )}
 
-        {/* ── Row action buttons ─────────────────────────────── */}
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* FILE menu */}
           <Menu
             menuButton={
               <MenuButton
                 className="bg-slate-700/50 hover:bg-slate-600 text-slate-300 hover:text-white p-1.5 rounded-md transition-all duration-200"
-                title="Add File"
+                title="Add File or Folder"
               >
                 <FilePlus className="w-4 h-4" />
               </MenuButton>
@@ -112,8 +102,14 @@ const FolderItem = ({
             portal
             menuClassName="bg-slate-900 border border-slate-800 rounded-lg shadow-xl min-w-[160px]"
           >
-            <CreateFileMenu parentPath={item.path} />
-
+            <MenuItem
+              onClick={() => onCreateFolder(item.path)}
+              className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              <FolderPlus className="w-4 h-4" />
+              New Subfolder...
+            </MenuItem>
+            <CreateFileMenu parentPath={item.path} onCreateFile={onCreateFile} />
             <MenuItem
               onClick={handleUploadClick}
               className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
@@ -123,14 +119,13 @@ const FolderItem = ({
             </MenuItem>
           </Menu>
 
-          {/* FOLDER menu */}
           <Menu
             menuButton={
               <MenuButton
                 className="bg-slate-700/50 hover:bg-slate-600 text-slate-300 hover:text-white p-1.5 rounded-md transition-all duration-200"
                 title="Folder actions"
               >
-                <FolderPlus className="w-4 h-4" />
+                <MoreVertical className="w-4 h-4" />
               </MenuButton>
             }
             direction="bottom"
@@ -142,28 +137,22 @@ const FolderItem = ({
               onClick={() => setIsRenaming(true)}
               className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
             >
+              <Edit className="w-4 h-4" />
               Rename
             </MenuItem>
             <MenuItem
               onClick={() => onDelete(item.path)}
               className="flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-colors"
             >
+              <Trash2 className="w-4 h-4" />
               Delete
-            </MenuItem>
-            <MenuItem
-              onClick={createSubfolder}
-              className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
-            >
-              Create Subfolder
             </MenuItem>
           </Menu>
         </div>
       </div>
 
-      {/* Hidden file picker for uploads */}
       <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelected} />
 
-      {/* ── Children tree ────────────────────────────────────── */}
       {isOpen && (
         <div className="ml-6 mt-2 space-y-1 border-l border-slate-800 pl-4">
           {item.children?.length ? (
@@ -176,6 +165,7 @@ const FolderItem = ({
                 onRename={onRename}
                 onDelete={onDelete}
                 onCreateFolder={onCreateFolder}
+                onCreateFile={onCreateFile}
                 onUploadFile={onUploadFile}
                 onRefresh={onRefresh}
                 userId={userId}
