@@ -6,7 +6,7 @@ import {
   SelectContent,
   SelectItem
 } from "@/components/ui/select";           // shadcn-ui primitive
-import { useDocumentIds } from "@/hooks/usedocumentids";
+import { useDocumentIds } from "@/hooks/useDocumentids";
 
 /**
  * Reusable dropdown for document IDs.

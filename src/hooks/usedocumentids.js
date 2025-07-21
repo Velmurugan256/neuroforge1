@@ -1,51 +1,36 @@
-import { useEffect, useState } from "react";
+"use client"
 
-/**
- * Fetches document IDs from the status tracker.
- *
- * @param {string|string[]} status  Single status ("uploaded") or array ["uploaded","retry"].
- * @param {Array}           deps    Extra dependencies that should trigger a refetch
- *                                  (e.g. a refresh counter from parent).
- *
- * @returns {{ docs: string[], loading: boolean }}
- */
-export function useDocumentIds(status = "learned", deps = []) {
-  const [docs,    setDocs]    = useState([]);
-  const [loading, setLoading] = useState(true);
+import { useState, useEffect } from "react"
+
+const useDocumentIds = () => {
+  const [documentIds, setDocumentIds] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    let alive = true;                 // avoid state set after unmount
-
-    (async () => {
-      setLoading(true);
+    const fetchDocumentIds = async () => {
       try {
-        const res = await fetch(
-          "https://a4pifj82cl.execute-api.us-east-1.amazonaws.com/prod/status/list?limit=500"
-        );
-        const rows = await res.json();
+        const response = await fetch(
+          "https://a4pifj82cl.execute-api.us-east-1.amazonaws.com/prod/status/list?limit=1000",
+        )
 
-        // Uncomment next line to debug raw rows
-        // console.log("📦 All status entries:", rows);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
 
-        const wanted = Array.isArray(status) ? status : [status];
-
-        const filtered = rows
-          .filter((row) => wanted.includes(row.status))
-          .map((row) => row.document_id);
-
-        if (alive) setDocs(filtered);
-      } catch (err) {
-        console.error("❌ Doc-ID fetch failed:", err);
-        if (alive) setDocs([]);
+        const data = await response.json()
+        setDocumentIds(data)
+      } catch (e) {
+        setError(e)
       } finally {
-        if (alive) setLoading(false);
+        setLoading(false)
       }
-    })();
+    }
 
-    return () => {
-      alive = false;
-    };
-  }, [status, ...deps]);   // ← re-run when status OR any dep changes
+    fetchDocumentIds()
+  }, [])
 
-  return { docs, loading };
+  return { documentIds, loading, error }
 }
+
+export default useDocumentIds
