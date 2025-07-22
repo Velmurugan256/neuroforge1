@@ -1,6 +1,6 @@
-import { BASE_URL, BUCKET, AUTH_HEADER } from "@/config/constants"
+import { BASE_URL, BUCKET, AUTH_HEADER, ENDAVA_API_URL } from "@/config/constants"
 
-const FOLDER_ROUTE = "/folder_Handler"
+const FOLDER_ROUTE = "/Folder_Handler"
 
 /** Extracts [folderPath, folderName] from an S3-style path */
 const extractPathAndName = (fullPath) => {
@@ -12,7 +12,7 @@ const extractPathAndName = (fullPath) => {
 
 /** Return hierarchical S3 tree (GET) */
 export const getS3Tree = async () => {
-  const r = await fetch("https://j2zd18f5y1.execute-api.us-east-1.amazonaws.com/prod/get-s3-tree")
+  const r = await fetch(`${ENDAVA_API_URL}/get-s3-tree`)
   if (!r.ok) throw new Error(`Failed to fetch S3 tree (${r.status})`)
   return r.json()
 }
@@ -27,7 +27,7 @@ export const createFolder = async (fullPath) => {
     payload: { path: folderPath, folderName },
   }
 
-  const r = await fetch(`${BASE_URL}${FOLDER_ROUTE}`, {
+  const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...AUTH_HEADER },
     body: JSON.stringify(body),
@@ -48,7 +48,7 @@ export const renameItem = async (oldPath, newPath) => {
     payload: { oldPath, newPath },
   }
 
-  const r = await fetch(`${BASE_URL}${FOLDER_ROUTE}`, {
+  const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...AUTH_HEADER },
     body: JSON.stringify(body),
@@ -69,7 +69,7 @@ export const deleteItem = async (path) => {
     payload: { path, folderPath: path }, // Delete_Folder_Lambda expects both
   }
 
-  const r = await fetch(`${BASE_URL}${FOLDER_ROUTE}`, {
+  const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...AUTH_HEADER },
     body: JSON.stringify(body),
