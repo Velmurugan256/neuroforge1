@@ -1,10 +1,11 @@
 "use client"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 import { MoreVertical, Download, Edit, Trash2 } from "lucide-react"
+import { toast } from "sonner"
 import { getIcon } from "./treeHelpers"
 import { getPresignedDownloadUrl, readFileContent } from "@/api"
 
-const FileItem = ({ item, selectedItem, onSelect, onRename, onDelete, userId, userRole, onOpenDocument }) => {
+const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, userId, userRole, onOpenDocument }) => {
   const { name, path } = item
   const extension = name.split(".").pop().toLowerCase()
   const isSelected = selectedItem === path
@@ -15,39 +16,29 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDelete, userId, us
     ? "bg-cyan-500/10 text-cyan-300"
     : "hover:bg-slate-800/50 text-slate-300 hover:text-slate-100"
 
-  // Handle double-click to open file
   const handleDoubleClick = async () => {
     if (!userId || !userRole) {
-      alert("⚠️ Missing user credentials. Cannot fetch file.")
+      toast.warning("Missing user credentials", { description: "Cannot fetch file." })
       return
     }
 
+    const toastId = toast.loading("Opening file...", { description: name })
     try {
       const content = await readFileContent(path, userId, userRole)
-
-      if (!content || content.trim() === "") {
-        console.warn("📂 File is empty:", name)
-      }
-
-      onOpenDocument?.({
-        name,
-        path,
-        type: extension,
-        content,
-      })
+      toast.success("File loaded", { id: toastId, description: name })
+      onOpenDocument?.({ name, path, type: extension, content })
     } catch (err) {
-      console.error("❌ File read failed:", err)
-      alert("❌ Failed to load file content.")
+      toast.error("Failed to load file content", { id: toastId, description: err.message })
     }
   }
 
-  // Handle download
   const handleDownload = async () => {
     if (!userId || !userRole) {
-      alert("⚠️ Missing user credentials. Cannot download file.")
+      toast.warning("Missing user credentials", { description: "Cannot download file." })
       return
     }
 
+    const toastId = toast.loading("Preparing download...", { description: name })
     try {
       const downloadUrl = await getPresignedDownloadUrl(path, userId, userRole)
       const link = document.createElement("a")
@@ -56,9 +47,9 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDelete, userId, us
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
+      toast.success("Download started", { id: toastId, description: name })
     } catch (err) {
-      console.error("❌ Download failed:", err)
-      alert("❌ File download failed.")
+      toast.error("File download failed", { id: toastId, description: err.message })
     }
   }
 
@@ -79,7 +70,7 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDelete, userId, us
       >
         <MenuItem
           onClick={() => {
-            const newName = prompt("New file name:", name)
+            const newName = prompt("New file name:", name) // Keeping prompt for rename for now
             if (newName && path) {
               const newPath = path.split("/").slice(0, -1).concat(newName).join("/")
               onRename(path, newPath)
@@ -100,7 +91,7 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDelete, userId, us
         </MenuItem>
 
         <MenuItem
-          onClick={() => onDelete(path)}
+          onClick={() => onDeleteRequest(path, name)}
           className="flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-colors"
         >
           <Trash2 className="w-4 h-4" />

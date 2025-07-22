@@ -1,13 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import useTreeData from "@/hooks/useTreeData"
 import TreeView from "./TreeView"
 import Breadcrumb from "./Breadcrumb"
 import SideNavHeader from "./SideNavHeader"
 import CreateFolderModal from "./CreateFolderModal"
-import CreateFileModal from "./CreateFileModal" // 👈 Import the new file modal
-import { uploadFile, createFile } from "@/api" // 👈 Import createFile API
+import CreateFileModal from "./CreateFileModal"
+import ConfirmationModal from "@/components/ui/ConfirmationModal"
+import { uploadFile, createFile } from "@/api"
 
 const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const { treeData, loading, error, fetchTree, createNewFolder, renameItem, deleteItem } = useTreeData()
@@ -15,11 +17,13 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const [selectedItem, setSelectedItem] = useState(null)
   const [breadcrumb, setBreadcrumb] = useState([])
 
-  // State for modals
+  // --- State for all modals ---
   const [isFolderModalOpen, setFolderModalOpen] = useState(false)
   const [isFileModalOpen, setFileModalOpen] = useState(false)
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
   const [modalParentPath, setModalParentPath] = useState("")
   const [modalFileType, setModalFileType] = useState("txt")
+  const [confirmModalProps, setConfirmModalProps] = useState({})
 
   const handleSelect = (path) => {
     if (!path) return
@@ -27,7 +31,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
     setBreadcrumb(path.split("/").filter(Boolean))
   }
 
-  // --- Folder Modal Logic ---
+  // --- Modal Logic ---
   const handleOpenCreateFolderModal = (parentPath = "") => {
     const isFileSelected = selectedItem && selectedItem.includes(".")
     const finalPath = isFileSelected ? selectedItem.split("/").slice(0, -1).join("/") : parentPath
@@ -35,17 +39,11 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
     setFolderModalOpen(true)
   }
 
-  const handleConfirmCreateFolder = async (newFolderName) => {
+  const handleConfirmCreateFolder = (newFolderName) => {
     const fullPath = modalParentPath ? `${modalParentPath}/${newFolderName}` : newFolderName
-    try {
-      await createNewFolder(fullPath)
-      fetchTree()
-    } catch (err) {
-      alert(`Error creating folder: ❌ ${err.message}`)
-    }
+    createNewFolder(fullPath)
   }
 
-  // --- File Modal Logic ---
   const handleOpenCreateFileModal = (parentPath, fileType) => {
     setModalParentPath(parentPath || "")
     setModalFileType(fileType)
@@ -56,19 +54,32 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
     const fullPath = `${modalParentPath}/${newFileName}.${modalFileType}`
     try {
       await createFile(fullPath)
+      toast.success("File created", { description: fullPath })
       fetchTree()
     } catch (err) {
-      alert(`Failed to create file: ${err.message}`)
+      toast.error("Failed to create file", { description: err.message })
     }
+  }
+
+  const handleOpenDeleteConfirm = (path, name) => {
+    setConfirmModalProps({
+      title: "Delete Item",
+      message: `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      onConfirm: () => deleteItem(path),
+    })
+    setConfirmModalOpen(true)
   }
 
   // --- Upload Logic ---
   const handleUploadFile = async (folderPath, file) => {
+    const toastId = toast.loading("Uploading file...", { description: file.name })
     try {
       await uploadFile(folderPath, file, userId, userRole)
+      toast.success("Upload successful", { id: toastId, description: file.name })
       fetchTree()
     } catch (err) {
-      alert(`Upload failed: ${err.message}`)
+      toast.error("Upload failed", { id: toastId, description: err.message })
     }
   }
 
@@ -103,9 +114,9 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
               selectedItem={selectedItem}
               onSelect={handleSelect}
               onRename={renameItem}
-              onDelete={deleteItem}
+              onDeleteRequest={handleOpenDeleteConfirm}
               onCreateFolder={handleOpenCreateFolderModal}
-              onCreateFile={handleOpenCreateFileModal} // 👈 Pass file modal handler
+              onCreateFile={handleOpenCreateFileModal}
               onUploadFile={handleUploadFile}
               onRefresh={fetchTree}
               userId={userId}
@@ -129,6 +140,11 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
         onSubmit={handleConfirmCreateFile}
         parentPath={modalParentPath}
         fileType={modalFileType}
+      />
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        {...confirmModalProps}
       />
     </>
   )

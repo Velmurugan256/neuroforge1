@@ -13,9 +13,9 @@ const FolderItem = ({
   selectedItem,
   onSelect,
   onRename,
-  onDelete,
+  onDeleteRequest,
   onCreateFolder,
-  onCreateFile, // 👈 Receive new prop
+  onCreateFile,
   onUploadFile,
   onRefresh,
   userId,
@@ -34,10 +34,8 @@ const FolderItem = ({
     if (!file) return
     try {
       await onUploadFile?.(item.path, file)
-      onRefresh?.()
     } catch (err) {
-      console.error(err)
-      alert("Upload failed ❌")
+      // Error is handled by the parent component's toast
     } finally {
       e.target.value = ""
     }
@@ -141,7 +139,7 @@ const FolderItem = ({
               Rename
             </MenuItem>
             <MenuItem
-              onClick={() => onDelete(item.path)}
+              onClick={() => onDeleteRequest(item.path, item.name)}
               className="flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
@@ -163,7 +161,7 @@ const FolderItem = ({
                 selectedItem={selectedItem}
                 onSelect={onSelect}
                 onRename={onRename}
-                onDelete={onDelete}
+                onDeleteRequest={onDeleteRequest}
                 onCreateFolder={onCreateFolder}
                 onCreateFile={onCreateFile}
                 onUploadFile={onUploadFile}

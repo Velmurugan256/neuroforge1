@@ -6,9 +6,9 @@ const TreeView = ({
   selectedItem,
   onSelect,
   onRename,
-  onDelete,
+  onDeleteRequest, // Renamed from onDelete
   onCreateFolder,
-  onCreateFile, // 🔹 NEW prop
+  onCreateFile,
   onUploadFile,
   onRefresh,
   userId,
@@ -26,9 +26,9 @@ const TreeView = ({
           selectedItem={selectedItem}
           onSelect={onSelect}
           onRename={onRename}
-          onDelete={onDelete}
+          onDeleteRequest={onDeleteRequest} // Pass down
           onCreateFolder={onCreateFolder}
-          onCreateFile={onCreateFile} // 🔹 Pass down
+          onCreateFile={onCreateFile}
           onUploadFile={onUploadFile}
           onRefresh={onRefresh}
           userId={userId}
