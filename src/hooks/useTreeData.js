@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { getS3Tree, createFolder, renameItem as apiRenameItem, deleteItem as apiDeleteItem } from "@/api/files"
+import { getS3Tree, createFolder, renameItem as apiRenameItem, deleteItem as apiDeleteItem, deleteFile } from "@/api/files"
 
 const useTreeData = () => {
   const [treeData, setTreeData] = useState([])
@@ -53,10 +53,21 @@ const useTreeData = () => {
     }
   }
 
-  const deletePath = async (path) => {
+  const deletePath = async (path, userId, userRole) => {
     try {
-      await apiDeleteItem(path)
-      toast.success("Item deleted", { description: path })
+      // Check if the path is a file (has an extension) or folder
+      const isFile = path.includes('.') && !path.endsWith('/')
+      
+      if (isFile) {
+        // Use the specific deleteFile API for files
+        await deleteFile(path, userId, userRole)
+        toast.success("File deleted", { description: path.split('/').pop() })
+      } else {
+        // Use the generic deleteItem API for folders
+        await apiDeleteItem(path)
+        toast.success("Folder deleted", { description: path.split('/').pop() })
+      }
+      
       fetchTree()
     } catch (err) {
       toast.error("Error deleting item", { description: err.message })

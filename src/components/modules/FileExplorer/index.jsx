@@ -53,7 +53,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const handleConfirmCreateFile = async (newFileName) => {
     const fullPath = `${modalParentPath}/${newFileName}.${modalFileType}`
     try {
-      await createFile(fullPath)
+      await createFile(fullPath, userId, userRole)
       toast.success("File created", { description: fullPath })
       fetchTree()
     } catch (err) {
@@ -66,7 +66,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
       title: "Delete Item",
       message: `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`,
       confirmText: "Delete",
-      onConfirm: () => deleteItem(path),
+      onConfirm: () => deleteItem(path, userId, userRole),
     })
     setConfirmModalOpen(true)
   }

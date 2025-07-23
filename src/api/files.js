@@ -81,19 +81,20 @@ export const deleteItem = async (path) => {
 }
 
 /** Create an empty .json / .txt file */
-export const createFile = async (path) => {
+export const createFile = async (path, userId, userRole) => {
   const fileType = path.endsWith(".json") ? "json" : path.endsWith(".txt") ? "txt" : null
 
   if (!fileType || !path) throw new Error("Missing required parameters: file_type and key are required")
+  if (!userId || !userRole) throw new Error("User ID and role are required")
 
   const body = {
     file_type: fileType,
     key: path,
-    user_id: "vmarimuthu@endava.com",
-    user_role: "Editor",
+    user_id: userId,
+    user_role: userRole,
   }
 
-  const r = await fetch(`${BASE_URL}/file/create`, {
+  const r = await fetch(`${ENDAVA_API_URL}/File_Create_file`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...AUTH_HEADER },
     body: JSON.stringify(body),
@@ -101,6 +102,28 @@ export const createFile = async (path) => {
 
   const res = await r.json()
   if (!r.ok) throw new Error(res.message || "Failed to create file")
+  return res
+}
+
+/** Delete a file */
+export const deleteFile = async (path, userId, userRole) => {
+  if (!path) throw new Error("File path is required")
+  if (!userId || !userRole) throw new Error("User ID and role are required")
+
+  const body = {
+    key: path,
+    user_id: userId,
+    user_role: userRole,
+  }
+
+  const r = await fetch(`${ENDAVA_API_URL}/File_Delete_file`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    body: JSON.stringify(body),
+  })
+
+  const res = await r.json()
+  if (!r.ok) throw new Error(res.message || "Failed to delete file")
   return res
 }
 

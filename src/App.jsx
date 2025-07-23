@@ -25,6 +25,7 @@ const router = createBrowserRouter([
             <DashboardPage />
           </ProtectedRoute>
         ),
+        
       },
       {
         path: "/login",
