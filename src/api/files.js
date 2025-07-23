@@ -132,7 +132,7 @@ export const getPresignedDownloadUrl = async (path, userId, userRole) => {
   if (!path || !userId || !userRole) throw new Error("Missing parameters")
 
   const qs = new URLSearchParams({ key: path, user_id: userId, user_role: userRole })
-  const r = await fetch(`${BASE_URL}/file/download-url?${qs}`, {
+  const r = await fetch(`${ENDAVA_API_URL}/File_Download_file?${qs}`, {
     headers: AUTH_HEADER,
   })
 
@@ -179,7 +179,7 @@ export const uploadFile = async (folderPath, file, userId, userRole) => {
 
   const body = { key, content: base64, user_id: userId, user_role: userRole }
 
-  const r = await fetch(`${BASE_URL}/file/upload`, {
+  const r = await fetch(`${ENDAVA_API_URL}/File_Upload_file`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...AUTH_HEADER },
     body: JSON.stringify(body),
