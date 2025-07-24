@@ -1,4 +1,4 @@
-import { BASE_URL, AUTH_HEADER } from "@/config/constants"
+import { BASE_URL, getAuthHeaders } from "@/config/constants"
 
 const SYNC_ROUTE = "/NeuroSync"
 const WIPE_ROUTE = "/NeuroWipe"
@@ -11,7 +11,7 @@ const STATUS_LIST_ROUTE = `${BASE_URL}/status/list`
  */
 export const fetchRecentActivity = async (limit = 25, status) => {
   const qs = new URLSearchParams({ limit, ...(status && { status }) })
-  const r = await fetch(`${STATUS_LIST_ROUTE}?${qs}`, { headers: AUTH_HEADER })
+  const r = await fetch(`${STATUS_LIST_ROUTE}?${qs}`, { headers: getAuthHeaders() })
   if (!r.ok) throw new Error("Status fetch failed")
   return r.json()
 }
@@ -23,7 +23,7 @@ export const fetchRecentActivity = async (limit = 25, status) => {
  */
 export const fetchDocStatusMap = async (limit = 1000) => {
   const qs = new URLSearchParams({ limit })
-  const r = await fetch(`${STATUS_LIST_ROUTE}?${qs}`, { headers: AUTH_HEADER })
+  const r = await fetch(`${STATUS_LIST_ROUTE}?${qs}`, { headers: getAuthHeaders() })
   if (!r.ok) throw new Error("Status fetch failed")
   const rows = await r.json()
   return Object.fromEntries(rows.map((r) => [r.document_id, r.status]))
@@ -47,7 +47,7 @@ export const neuroSync = async (target = "ALL", action = null) => {
 
   const r = await fetch(`${BASE_URL}${SYNC_ROUTE}`, {
     method: "POST",
-    headers: { ...AUTH_HEADER, "Content-Type": "application/json" },
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(body),
   })
 
@@ -65,7 +65,7 @@ export const neuroWipe = async (docIds) => {
 
   const r = await fetch(`${BASE_URL}${WIPE_ROUTE}`, {
     method: "POST",
-    headers: { ...AUTH_HEADER, "Content-Type": "application/json" },
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(body),
   })
 
@@ -82,7 +82,7 @@ export const fileStatus = async (documentId) => {
   if (!documentId) throw new Error("documentId is required")
 
   const qs = new URLSearchParams({ document_id: documentId })
-  const r = await fetch(`${STATUS_FILE_ROUTE}?${qs}`, { headers: AUTH_HEADER })
+  const r = await fetch(`${STATUS_FILE_ROUTE}?${qs}`, { headers: getAuthHeaders() })
   if (!r.ok) throw new Error(`fileStatus failed (${r.status})`)
   return r.json()
 }

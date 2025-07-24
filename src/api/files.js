@@ -1,4 +1,4 @@
-import { BASE_URL, BUCKET, AUTH_HEADER, ENDAVA_API_URL } from "@/config/constants"
+import { BASE_URL, BUCKET, getAuthHeaders, ENDAVA_API_URL } from "@/config/constants"
 
 const FOLDER_ROUTE = "/Folder_Handler"
 
@@ -12,7 +12,9 @@ const extractPathAndName = (fullPath) => {
 
 /** Return hierarchical S3 tree (GET) */
 export const getS3Tree = async () => {
-  const r = await fetch(`${ENDAVA_API_URL}/get-s3-tree`)
+  const r = await fetch(`${ENDAVA_API_URL}/get-s3-tree`, {
+    headers: getAuthHeaders()
+  })
   if (!r.ok) throw new Error(`Failed to fetch S3 tree (${r.status})`)
   return r.json()
 }
@@ -29,7 +31,7 @@ export const createFolder = async (fullPath) => {
 
   const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
@@ -50,7 +52,7 @@ export const renameItem = async (oldPath, newPath) => {
 
   const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
@@ -71,7 +73,7 @@ export const deleteItem = async (path) => {
 
   const r = await fetch(`${ENDAVA_API_URL}${FOLDER_ROUTE}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
@@ -96,7 +98,7 @@ export const createFile = async (path, userId, userRole) => {
 
   const r = await fetch(`${ENDAVA_API_URL}/File_Create_file`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
@@ -118,7 +120,7 @@ export const deleteFile = async (path, userId, userRole) => {
 
   const r = await fetch(`${ENDAVA_API_URL}/File_Delete_file`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
@@ -133,7 +135,7 @@ export const getPresignedDownloadUrl = async (path, userId, userRole) => {
 
   const qs = new URLSearchParams({ key: path, user_id: userId, user_role: userRole })
   const r = await fetch(`${ENDAVA_API_URL}/File_Download_file?${qs}`, {
-    headers: AUTH_HEADER,
+    headers: getAuthHeaders(),
   })
 
   const res = await r.json()
@@ -148,7 +150,9 @@ export const readFileContent = async (path, userId, userRole) => {
   if (!path || !userId || !userRole) throw new Error("Missing parameters")
 
   const qs = new URLSearchParams({ key: path, user_id: userId, user_role: userRole })
-  const r = await fetch(`${BASE_URL}/file/read?${qs}`)
+  const r = await fetch(`${BASE_URL}/file/read?${qs}`, {
+    headers: getAuthHeaders(),
+  })
 
   let res = await r.json()
   if (!r.ok) throw new Error(res.message || "File read failed")
@@ -181,7 +185,7 @@ export const uploadFile = async (folderPath, file, userId, userRole) => {
 
   const r = await fetch(`${ENDAVA_API_URL}/File_Upload_file`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...AUTH_HEADER },
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   })
 
