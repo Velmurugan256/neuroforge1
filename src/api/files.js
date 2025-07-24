@@ -147,28 +147,41 @@ export const getPresignedDownloadUrl = async (path, userId, userRole) => {
 
 /** Read file content (used by FileViewer) */
 export const readFileContent = async (path, userId, userRole) => {
-  if (!path || !userId || !userRole) throw new Error("Missing parameters")
+  if (!path || !userId || !userRole) throw new Error("Missing parameters");
 
-  const qs = new URLSearchParams({ key: path, user_id: userId, user_role: userRole })
-  const r = await fetch(`${BASE_URL}/file/read?${qs}`, {
-    headers: getAuthHeaders(),
-  })
+  const r = await fetch(`${ENDAVA_API_URL}/File_Read_file`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      key: path,
+      user_id: userId,
+      user_role: userRole,
+    }),
+  });
 
-  let res = await r.json()
-  if (!r.ok) throw new Error(res.message || "File read failed")
+  let res = await r.json();
 
+  if (!r.ok) throw new Error(res.message || "File read failed");
+
+  // If Lambda response body is double-wrapped, unwrap it
   if (typeof res.body === "string") {
     try {
-      res = JSON.parse(res.body)
+      res = JSON.parse(res.body);
     } catch {
-      throw new Error("Failed to parse response body")
+      throw new Error("Failed to parse response body");
     }
   }
 
-  if (res.status !== "success" || !res.content) throw new Error(res.message || "File content missing")
+  if (res.status !== "success" || !res.content) {
+    throw new Error(res.message || "File content missing");
+  }
 
-  return res.content
-}
+  return res.content;
+};
+
 
 /** Generic file upload (any MIME) */
 export const uploadFile = async (folderPath, file, userId, userRole) => {
