@@ -55,7 +55,7 @@ const ExcelViewer = ({ fileUrl, filePath }) => {
   const columns = data[0] || []
 
   return (
-    <div className="w-full h-full bg-gray-900 text-white p-6 font-mono text-sm overflow-auto">
+    <div className="w-full bg-gray-900 text-white p-6 font-mono text-sm">
       {/* File path */}
       {filePath && (
         <div className="text-xs text-blue-400 mb-3 font-semibold border-b border-gray-700 pb-1">{filePath}</div>

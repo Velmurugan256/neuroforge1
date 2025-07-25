@@ -3,14 +3,14 @@ import { useState } from "react"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 import { MoreVertical, Download, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import { getIcon } from "./treeHelpers"
+import { getFileIcon } from "@/lib/file-icons"
 import { getPresignedDownloadUrl, readFileContent } from "@/api"
 
 const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, userId, userRole, onOpenDocument }) => {
   const { name, path } = item
   const extension = name.split(".").pop().toLowerCase()
   const isSelected = selectedItem === path
-  
+
   const [isRenaming, setIsRenaming] = useState(false)
   const [newName, setNewName] = useState(name)
 
@@ -71,9 +71,13 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, use
   }
 
   return (
-    <div onClick={() => !isRenaming && onSelect(path)} onDoubleClick={!isRenaming ? handleDoubleClick : undefined} className={`${baseClasses} ${activeClasses}`}>
+    <div
+      onClick={() => !isRenaming && onSelect(path)}
+      onDoubleClick={!isRenaming ? handleDoubleClick : undefined}
+      className={`${baseClasses} ${activeClasses}`}
+    >
       <span className="font-medium flex items-center gap-3 min-w-0 flex-1">
-        <span className="text-lg flex-shrink-0">{getIcon(name)}</span>
+        <span className="text-lg flex-shrink-0">{getFileIcon(name)}</span>
         {isRenaming ? (
           <input
             className="bg-slate-800/90 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 flex-1 min-w-0"

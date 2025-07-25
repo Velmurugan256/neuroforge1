@@ -8,6 +8,8 @@ import MainViewerPanel from "../components/modules/DocumentViewer/index.jsx"
 import RightPanelContainer from "../components/modules/IngestionDashboard/index.jsx"
 import Footer from "../components/layout/Footer.jsx"
 import MobileNav from "../components/layout/MobileNav.jsx"
+import PlaygroundButton from "../components/modules/ChatPlayground/PlaygroundButton.jsx"
+import ChatPlayground from "../components/modules/ChatPlayground/index.jsx"
 import { useAuth } from "@/context/AuthContext.jsx"
 import { useMediaQuery } from "@/hooks/useMediaQuery.js"
 
@@ -21,6 +23,7 @@ function DashboardPage() {
   const [openDocuments, setOpenDocuments] = useState([])
   const [activeIndex, setActiveIndex] = useState(0)
   const [activePanel, setActivePanel] = useState("explorer")
+  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false)
 
   const openDocument = (doc) => {
     const alreadyOpenIndex = openDocuments.findIndex((d) => d.name === doc.name)
@@ -34,6 +37,8 @@ function DashboardPage() {
     if (isMobile) {
       setActivePanel("viewer")
     }
+    // Close playground when opening a document
+    setIsPlaygroundOpen(false)
   }
 
   const closeDocument = (docToClose) => {
@@ -46,13 +51,21 @@ function DashboardPage() {
     })
   }
 
+  const togglePlayground = () => {
+    setIsPlaygroundOpen(!isPlaygroundOpen)
+    // Switch to viewer panel on mobile when playground opens
+    if (!isPlaygroundOpen && isMobile) {
+      setActivePanel("viewer")
+    }
+  }
+
   const renderDesktopLayout = () => (
     <ResizablePanelGroup direction="horizontal" className="h-full">
       <ResizablePanel defaultSize={18} minSize={15} maxSize={25}>
         <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} />
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={60}>
+      <ResizablePanel defaultSize={60} className="flex flex-col">
         <MainContent />
       </ResizablePanel>
       <ResizableHandle />
@@ -72,8 +85,10 @@ function DashboardPage() {
   )
 
   const MainContent = () => (
-    <div className="flex-1 min-w-0 overflow-hidden h-full">
-      {openDocuments.length > 0 ? (
+    <div className="flex flex-col flex-1 h-full w-full min-h-0">
+      {isPlaygroundOpen ? (
+        <ChatPlayground onClose={() => setIsPlaygroundOpen(false)} />
+      ) : openDocuments.length > 0 ? (
         <MainViewerPanel
           openDocuments={openDocuments}
           onCloseDocument={closeDocument}
@@ -89,9 +104,19 @@ function DashboardPage() {
             <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Welcome to NeuroForge
             </h1>
-            <p className="text-slate-400 text-lg leading-relaxed">
+            <p className="text-slate-400 text-lg leading-relaxed mb-6">
               Select a file from the Explorer to begin working with your documents.
             </p>
+            <div className="flex flex-col gap-3 text-sm text-slate-500">
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
+                <span>Try the AI Playground to test bot interactions</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Upload documents to get started</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -103,6 +128,9 @@ function DashboardPage() {
       <HeaderBar />
       <main className="flex-1 overflow-hidden">{isMobile ? renderMobileLayout() : renderDesktopLayout()}</main>
       {!isMobile && <Footer />}
+
+      {/* Floating Playground Button */}
+      <PlaygroundButton onToggle={togglePlayground} isOpen={isPlaygroundOpen} />
     </div>
   )
 }

@@ -1,22 +1,19 @@
-// --- FILE: viewers/TextViewer.jsx ---
 import React from "react"
 
 const TextViewer = ({ content, filePath }) => {
-  const lines = content.split("\n")
+  const lines = content ? content.split("\n") : []
 
   return (
-    <div className="w-full h-full p-6 bg-gray-900 text-white font-mono text-sm overflow-auto">
-      {/* File path only (NO name) */}
-      {filePath && (
-        <div className="text-xs text-blue-400 mb-3 font-semibold border-b border-gray-700 pb-1">{filePath}</div>
-      )}
+    <div className="w-full p-6 bg-gray-900 text-white font-mono text-sm">
+      <div className="sticky top-0 bg-gray-900/80 backdrop-blur-sm z-10 -mx-6 -mt-6 px-6 py-3 mb-4 border-b border-slate-800">
+        <p className="text-sm text-cyan-400 truncate font-semibold">{filePath}</p>
+      </div>
 
-      {/* Line-numbered content */}
-      <pre className="grid grid-cols-[3em_1fr] gap-x-4 whitespace-pre-wrap break-words leading-relaxed">
+      <pre className="grid grid-cols-[auto_1fr] gap-x-4 whitespace-pre-wrap break-words leading-relaxed">
         {lines.map((line, idx) => (
           <React.Fragment key={idx}>
-            <span className="text-gray-600 text-right select-none">{idx + 1}</span>
-            <span>{line}</span>
+            <span className="text-slate-600 text-right select-none pr-4 border-r border-slate-800">{idx + 1}</span>
+            <span className="text-slate-200">{line}</span>
           </React.Fragment>
         ))}
       </pre>

@@ -2,6 +2,7 @@
 import DocumentPanel from "./DocumentPanel"
 import { X } from "lucide-react"
 import IconButton from "@/components/ui/IconButton"
+import { getFileIcon } from "@/lib/file-icons"
 
 const MainViewerPanel = ({ openDocuments, onCloseDocument, activeIndex, setActiveIndex }) => {
   const handleTabClick = (index) => {
@@ -17,31 +18,29 @@ const MainViewerPanel = ({ openDocuments, onCloseDocument, activeIndex, setActiv
 
   const activeDocument = openDocuments[activeIndex]
 
+  // --- Tab Styling ---
+  const tabBaseClasses =
+    "flex items-center pl-4 pr-2 py-2.5 cursor-pointer border-r transition-colors duration-200 min-w-0 max-w-[220px] group relative flex-shrink-0"
+  const inactiveTabClasses = "border-slate-800/50 bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+  const activeTabClasses = "border-slate-800/50 border-b-transparent bg-slate-900 text-white"
+
   return (
-    <div className="flex flex-col flex-1 h-full bg-slate-950 text-white font-sans text-sm">
+    <div className="flex flex-col flex-1 h-full bg-slate-950 text-white font-sans text-sm min-h-0">
       {/* Tab bar */}
-      <div className="flex-shrink-0 bg-slate-950 border-b border-slate-800/50 shadow-lg">
+      <div className="flex-shrink-0 bg-slate-950 border-b border-slate-800/50 shadow-sm">
         <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {openDocuments.map((doc, idx) => {
-            const folderPath = doc.path?.split("/").slice(0, -1).join("/") || "/"
             const isActive = idx === activeIndex
-
+            const folderPath = doc.path?.split("/").slice(0, -1).join("/") || "/"
             return (
               <div
                 key={doc.path}
-                className={`flex items-center pl-4 pr-2 py-2.5 cursor-pointer border-r border-slate-800/50 transition-all duration-200 min-w-0 max-w-[220px] group relative flex-shrink-0
-                  ${isActive ? "bg-slate-900" : "hover:bg-slate-900/50 text-slate-400 hover:text-slate-200"}
-                `}
+                className={`${tabBaseClasses} ${isActive ? activeTabClasses : inactiveTabClasses}`}
                 onClick={() => handleTabClick(idx)}
-                title={doc.path} // ✅ full path tooltip
+                title={doc.path}
               >
-                {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_theme(colors.cyan.500)]"></div>
-                )}
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-lg flex-shrink-0">
-                    {doc.type === "txt" ? "📄" : doc.type === "json" ? "🧾" : doc.type === "pdf" ? "📕" : "📁"}
-                  </span>
+                  <span className="text-lg flex-shrink-0">{getFileIcon(doc.name)}</span>
                   <div className="min-w-0 flex-1">
                     <div className={`truncate font-medium ${isActive ? "text-white" : "text-slate-300"}`}>
                       {doc.name}
@@ -49,7 +48,6 @@ const MainViewerPanel = ({ openDocuments, onCloseDocument, activeIndex, setActiv
                     <div className="text-xs text-slate-500 truncate">{folderPath}</div>
                   </div>
                 </div>
-
                 <IconButton
                   icon={X}
                   onClick={(e) => {
@@ -67,8 +65,8 @@ const MainViewerPanel = ({ openDocuments, onCloseDocument, activeIndex, setActiv
         </div>
       </div>
 
-      {/* Active document panel */}
-      <div className="flex-1 overflow-hidden bg-slate-950">
+      {/* Active document panel - THIS IS NOW THE SCROLL CONTAINER */}
+      <div className="flex-1 overflow-y-auto bg-slate-900 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent min-h-0">
         {activeDocument && <DocumentPanel key={activeDocument.path} document={activeDocument} onClose={handleClose} />}
       </div>
     </div>

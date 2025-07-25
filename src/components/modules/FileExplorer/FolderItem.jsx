@@ -5,7 +5,7 @@ import { FilePlus, FolderPlus, Upload, ChevronRight, ChevronDown, Edit, Trash2, 
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 
 import CreateFileMenu from "./CreateFileMenu"
-import { getIcon } from "./treeHelpers"
+import { getFileIcon } from "@/lib/file-icons"
 import TreeItem from "./TreeItem"
 
 const FolderItem = ({
@@ -76,7 +76,7 @@ const FolderItem = ({
               ) : (
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               )}
-              <span className="text-lg flex-shrink-0">{getIcon(item.name, true, isOpen)}</span>
+              <span className="text-lg flex-shrink-0">{getFileIcon(item.name, true, isOpen)}</span>
             </div>
             <input
               className="bg-slate-800/90 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 flex-1 min-w-0"
@@ -105,7 +105,7 @@ const FolderItem = ({
               ) : (
                 <ChevronRight className="w-4 h-4 text-slate-400" />
               )}
-              <span className="text-lg flex-shrink-0">{getIcon(item.name, true, isOpen)}</span>
+              <span className="text-lg flex-shrink-0">{getFileIcon(item.name, true, isOpen)}</span>
             </div>
             <span className="font-medium truncate text-sm">{decodeURIComponent(item.name)}</span>
           </div>
