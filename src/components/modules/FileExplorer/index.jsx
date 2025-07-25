@@ -97,8 +97,8 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
 
   return (
     <>
-      <div className="h-full bg-slate-950 text-white border-r border-slate-800/50">
-        <div className="p-4 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600">
+      <div className="h-full flex flex-col bg-slate-950 text-white border-r border-slate-800/50 min-h-0">
+        <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600 min-h-0">
           <SideNavHeader
             onRefresh={() => dispatch(fetchTreeData())}
             loading={loading}

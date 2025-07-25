@@ -38,8 +38,8 @@ const DocumentPanel = ({ document, onClose }) => {
   }
 
   return (
-    // This container should not have height constraints. It should grow with its content.
-    <div className="bg-slate-900">{renderViewer()}</div>
+    // This container needs height constraints to work properly with the parent scroll container
+    <div className="h-full bg-slate-900">{renderViewer()}</div>
   )
 }
 

@@ -60,16 +60,16 @@ function DashboardPage() {
   }
 
   const renderDesktopLayout = () => (
-    <ResizablePanelGroup direction="horizontal" className="h-full">
-      <ResizablePanel defaultSize={18} minSize={15} maxSize={25}>
+    <ResizablePanelGroup direction="horizontal" className="h-full min-h-0">
+      <ResizablePanel defaultSize={18} minSize={15} maxSize={25} className="min-h-0">
         <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} />
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={60} className="flex flex-col">
+      <ResizablePanel defaultSize={60} className="flex flex-col min-h-0">
         <MainContent />
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={22} minSize={18} maxSize={30}>
+      <ResizablePanel defaultSize={22} minSize={18} maxSize={30} className="min-h-0">
         <RightPanelContainer />
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -85,7 +85,7 @@ function DashboardPage() {
   )
 
   const MainContent = () => (
-    <div className="flex flex-col flex-1 h-full w-full min-h-0">
+    <div className="flex flex-col h-full w-full min-h-0 overflow-hidden">
       {isPlaygroundOpen ? (
         <ChatPlayground onClose={() => setIsPlaygroundOpen(false)} />
       ) : openDocuments.length > 0 ? (
@@ -124,9 +124,9 @@ function DashboardPage() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans flex flex-col">
+    <div className="h-screen bg-slate-950 text-slate-200 font-sans flex flex-col overflow-hidden">
       <HeaderBar />
-      <main className="flex-1 overflow-hidden">{isMobile ? renderMobileLayout() : renderDesktopLayout()}</main>
+      <main className="flex-1 min-h-0 overflow-hidden">{isMobile ? renderMobileLayout() : renderDesktopLayout()}</main>
       {!isMobile && <Footer />}
 
       {/* Floating Playground Button */}

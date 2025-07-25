@@ -118,8 +118,8 @@ export default function RightPanelContainer() {
   /* ─────────────────── render ─────────────────── */
   return (
     <>
-      <div className="w-full h-full bg-slate-950 text-white border-l border-slate-800/50 overflow-y-auto">
-        <div className="p-4 sm:p-6 space-y-6">
+      <div className="w-full h-full flex flex-col bg-slate-950 text-white border-l border-slate-800/50 min-h-0">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600 p-4 sm:p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

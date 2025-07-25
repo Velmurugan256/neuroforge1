@@ -55,32 +55,35 @@ const ExcelViewer = ({ fileUrl, filePath }) => {
   const columns = data[0] || []
 
   return (
-    <div className="w-full bg-gray-900 text-white p-6 font-mono text-sm">
-      {/* File path */}
-      {filePath && (
-        <div className="text-xs text-blue-400 mb-3 font-semibold border-b border-gray-700 pb-1">{filePath}</div>
-      )}
+    <div className="h-full flex flex-col bg-gray-900 text-white font-mono text-sm">
+      {/* Header with file path and sheet selector */}
+      <div className="flex-shrink-0 bg-gray-900/95 backdrop-blur-sm p-6 border-b border-gray-700">
+        {/* File path */}
+        {filePath && (
+          <div className="text-xs text-blue-400 mb-3 font-semibold">{filePath}</div>
+        )}
 
-      {/* Sheet selector */}
-      {sheets.length > 1 && (
-        <div className="mb-4">
-          <label className="text-gray-400 mr-2">Sheet:</label>
-          <select
-            value={activeSheet}
-            onChange={(e) => handleSheetChange(e.target.value)}
-            className="bg-gray-800 text-white border border-gray-600 px-2 py-1 rounded"
-          >
-            {sheets.map((sheet) => (
-              <option key={sheet} value={sheet}>
-                {sheet}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+        {/* Sheet selector */}
+        {sheets.length > 1 && (
+          <div>
+            <label className="text-gray-400 mr-2">Sheet:</label>
+            <select
+              value={activeSheet}
+              onChange={(e) => handleSheetChange(e.target.value)}
+              className="bg-gray-800 text-white border border-gray-600 px-2 py-1 rounded"
+            >
+              {sheets.map((sheet) => (
+                <option key={sheet} value={sheet}>
+                  {sheet}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Scrollable Table Content */}
+      <div className="flex-1 p-6 overflow-x-auto">
         <table className="min-w-full table-auto border border-gray-700">
           <thead className="bg-gray-800 text-blue-300">
             <tr>
