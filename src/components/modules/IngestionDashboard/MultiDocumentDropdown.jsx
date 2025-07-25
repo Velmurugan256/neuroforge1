@@ -49,11 +49,15 @@ export default function MultiDocumentDropdown({
   const toggle = (id) => {
     console.log("[MultiDocDropdown] click:", id)
     if (id === "ALL") {
-      onChange(value[0] === "ALL" ? [] : ["ALL"])
+      const newValue = value[0] === "ALL" ? [] : ["ALL"]
+      onChange(newValue)
       setOpen(false)
       return
     }
-    onChange((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev.filter((v) => v !== "ALL"), id]))
+    const newValue = value.includes(id) 
+      ? value.filter((v) => v !== id) 
+      : [...value.filter((v) => v !== "ALL"), id]
+    onChange(newValue)
   }
 
   /* ─────────── summary text ─────────── */
@@ -85,11 +89,16 @@ export default function MultiDocumentDropdown({
             {includeAll && (
               <li
                 className="flex items-center gap-2 p-2 hover:bg-gray-700 cursor-pointer whitespace-nowrap"
-                onClick={() => toggle("ALL")}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggle("ALL")
+                }}
               >
                 <Checkbox
                   checked={value[0] === "ALL"}
                   className="size-3 rounded-none border-gray-400 shrink-0 data-[state=checked]:bg-blue-600"
+                  onCheckedChange={() => toggle("ALL")}
                 />
                 ALL
               </li>
@@ -99,11 +108,16 @@ export default function MultiDocumentDropdown({
               <li
                 key={id}
                 className="flex items-center gap-2 p-2 hover:bg-gray-700 cursor-pointer whitespace-nowrap"
-                onClick={() => toggle(id)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggle(id)
+                }}
               >
                 <Checkbox
                   checked={value.includes(id)}
                   className="size-3 rounded-none border-gray-400 shrink-0 data-[state=checked]:bg-blue-600"
+                  onCheckedChange={() => toggle(id)}
                 />
                 <span title={id}>{id}</span>
               </li>

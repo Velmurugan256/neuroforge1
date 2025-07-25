@@ -31,16 +31,30 @@ const MainViewerPanel = ({ openDocuments, onCloseDocument, activeIndex, setActiv
         <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {openDocuments.map((doc, idx) => {
             const isActive = idx === activeIndex
-            const folderPath = doc.path?.split("/").slice(0, -1).join("/") || "/"
+            const isPlayground = doc.type === "playground"
+            const folderPath = isPlayground ? "AI Assistant" : (doc.path?.split("/").slice(0, -1).join("/") || "/")
+            const displayIcon = isPlayground ? "🤖" : getFileIcon(doc.name)
+            
+            // Special styling for playground tab
+            const playgroundActiveClasses = isPlayground && isActive 
+              ? "border-slate-800/50 border-b-transparent bg-slate-900 text-white shadow-lg shadow-cyan-500/10" 
+              : ""
+            const finalTabClasses = isPlayground && isActive 
+              ? `${tabBaseClasses} ${playgroundActiveClasses}`
+              : `${tabBaseClasses} ${isActive ? activeTabClasses : inactiveTabClasses}`
+            
             return (
               <div
                 key={doc.path}
-                className={`${tabBaseClasses} ${isActive ? activeTabClasses : inactiveTabClasses}`}
+                className={finalTabClasses}
                 onClick={() => handleTabClick(idx)}
-                title={doc.path}
+                title={isPlayground ? "AI Playground - Interactive Chat Assistant" : doc.path}
               >
+                {isPlayground && isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_theme(colors.cyan.500)]"></div>
+                )}
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-lg flex-shrink-0">{getFileIcon(doc.name)}</span>
+                  <span className="text-lg flex-shrink-0">{displayIcon}</span>
                   <div className="min-w-0 flex-1">
                     <div className={`truncate font-medium ${isActive ? "text-white" : "text-slate-300"}`}>
                       {doc.name}

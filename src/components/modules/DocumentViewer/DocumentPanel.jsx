@@ -4,6 +4,7 @@ import JsonTableViewer from "./viewers/JsonTableViewer"
 import PdfViewer from "./viewers/PdfViewer"
 import DocxViewer from "./viewers/DocxViewer"
 import ExcelViewer from "./viewers/ExcelViewer"
+import ChatInterface from "../ChatPlayground/ChatInterface"
 
 const DocumentPanel = ({ document, onClose }) => {
   const { name, path, type, content } = document
@@ -15,6 +16,8 @@ const DocumentPanel = ({ document, onClose }) => {
     }
 
     switch (type) {
+      case "playground":
+        return <ChatInterface onClose={() => onClose(document)} />
       case "json":
         return <JsonTableViewer content={content} filePath={path} />
       case "pdf":

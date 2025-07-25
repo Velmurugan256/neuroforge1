@@ -12,7 +12,7 @@ import CreateFolderModal from "./CreateFolderModal"
 import CreateFileModal from "./CreateFileModal"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 
-const SideNav = ({ userId, userRole, onOpenDocument }) => {
+const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
   const dispatch = useDispatch()
   
   // Get data from Redux store
@@ -103,6 +103,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
             onRefresh={() => dispatch(fetchTreeData())}
             loading={loading}
             onAddFolder={() => handleOpenCreateFolderModal(selectedItem || "")}
+            onOpenPlayground={onOpenPlayground}
             bucketName="Explorer"
           />
 

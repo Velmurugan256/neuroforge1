@@ -205,7 +205,7 @@ export default function RightPanelContainer() {
                     </button>
                     <MultiDocumentDropdown
                       value={syncTargets}
-                      onChange={setSyncTargets}
+                      onChange={(targets) => dispatch(setSyncTargets(targets))}
                       statusExclude={["learned"]}
                       includeAll={true}
                       placeholder="sync"
@@ -226,7 +226,7 @@ export default function RightPanelContainer() {
                     </button>
                     <MultiDocumentDropdown
                       value={wipeTargets}
-                      onChange={setWipeTargets}
+                      onChange={(targets) => dispatch(setWipeTargets(targets))}
                       statusInclude="learned"
                       includeAll={true}
                       placeholder="wipe"

@@ -9,7 +9,6 @@ import RightPanelContainer from "../components/modules/IngestionDashboard/index.
 import Footer from "../components/layout/Footer.jsx"
 import MobileNav from "../components/layout/MobileNav.jsx"
 import PlaygroundButton from "../components/modules/ChatPlayground/PlaygroundButton.jsx"
-import ChatPlayground from "../components/modules/ChatPlayground/index.jsx"
 import { useAuth } from "@/context/AuthContext.jsx"
 import { useMediaQuery } from "@/hooks/useMediaQuery.js"
 
@@ -23,7 +22,6 @@ function DashboardPage() {
   const [openDocuments, setOpenDocuments] = useState([])
   const [activeIndex, setActiveIndex] = useState(0)
   const [activePanel, setActivePanel] = useState("explorer")
-  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false)
 
   const openDocument = (doc) => {
     const alreadyOpenIndex = openDocuments.findIndex((d) => d.name === doc.name)
@@ -37,8 +35,28 @@ function DashboardPage() {
     if (isMobile) {
       setActivePanel("viewer")
     }
-    // Close playground when opening a document
-    setIsPlaygroundOpen(false)
+  }
+
+  const openPlayground = () => {
+    const playgroundDoc = {
+      name: "AI Playground",
+      path: "playground://ai-chat",
+      type: "playground",
+      content: null,
+      isSpecial: true
+    }
+    
+    const alreadyOpenIndex = openDocuments.findIndex((d) => d.type === "playground")
+    if (alreadyOpenIndex !== -1) {
+      setActiveIndex(alreadyOpenIndex)
+    } else {
+      setOpenDocuments((prev) => [...prev, playgroundDoc])
+      setActiveIndex(openDocuments.length)
+    }
+    // Switch to viewer panel on mobile when playground is opened
+    if (isMobile) {
+      setActivePanel("viewer")
+    }
   }
 
   const closeDocument = (docToClose) => {
@@ -52,17 +70,24 @@ function DashboardPage() {
   }
 
   const togglePlayground = () => {
-    setIsPlaygroundOpen(!isPlaygroundOpen)
-    // Switch to viewer panel on mobile when playground opens
-    if (!isPlaygroundOpen && isMobile) {
-      setActivePanel("viewer")
+    const playgroundIsOpen = openDocuments.some(doc => doc.type === "playground")
+    
+    if (playgroundIsOpen) {
+      // Close playground tab
+      const playgroundDoc = openDocuments.find(doc => doc.type === "playground")
+      if (playgroundDoc) {
+        closeDocument(playgroundDoc)
+      }
+    } else {
+      // Open playground tab
+      openPlayground()
     }
   }
 
   const renderDesktopLayout = () => (
     <ResizablePanelGroup direction="horizontal" className="h-full min-h-0">
       <ResizablePanel defaultSize={18} minSize={15} maxSize={25} className="min-h-0">
-        <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} />
+        <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} onOpenPlayground={openPlayground} />
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel defaultSize={60} className="flex flex-col min-h-0">
@@ -77,7 +102,7 @@ function DashboardPage() {
 
   const renderMobileLayout = () => (
     <div className="h-full pb-16">
-      {activePanel === "explorer" && <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} />}
+      {activePanel === "explorer" && <SideNavPanel userId={userId} userRole={userRole} onOpenDocument={openDocument} onOpenPlayground={openPlayground} />}
       {activePanel === "viewer" && <MainContent />}
       {activePanel === "stats" && <RightPanelContainer />}
       <MobileNav activePanel={activePanel} setActivePanel={setActivePanel} />
@@ -86,9 +111,7 @@ function DashboardPage() {
 
   const MainContent = () => (
     <div className="flex flex-col h-full w-full min-h-0 overflow-hidden">
-      {isPlaygroundOpen ? (
-        <ChatPlayground onClose={() => setIsPlaygroundOpen(false)} />
-      ) : openDocuments.length > 0 ? (
+      {openDocuments.length > 0 ? (
         <MainViewerPanel
           openDocuments={openDocuments}
           onCloseDocument={closeDocument}
@@ -130,7 +153,7 @@ function DashboardPage() {
       {!isMobile && <Footer />}
 
       {/* Floating Playground Button */}
-      <PlaygroundButton onToggle={togglePlayground} isOpen={isPlaygroundOpen} />
+      <PlaygroundButton onToggle={togglePlayground} isOpen={openDocuments.some(doc => doc.type === "playground")} />
     </div>
   )
 }
