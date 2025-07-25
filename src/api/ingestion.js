@@ -1,9 +1,9 @@
-import { BASE_URL, getAuthHeaders } from "@/config/constants"
+import { BASE_URL, getAuthHeaders, ENDAVA_API_URL } from "@/config/constants"
 
 const SYNC_ROUTE = "/NeuroSync"
 const WIPE_ROUTE = "/NeuroWipe"
-const STATUS_FILE_ROUTE = `${BASE_URL}/filestatus_DB/Get`
-const STATUS_LIST_ROUTE = `${BASE_URL}/status/list`
+const STATUS_FILE_ROUTE = `${ENDAVA_API_URL}/filestatus_DB/Get`
+const STATUS_LIST_ROUTE = `${ENDAVA_API_URL}/status/list`
 
 /**
  * @param {number} limit   max rows
@@ -45,7 +45,7 @@ export const neuroSync = async (target = "ALL", action = null) => {
     body = { scope: "SINGLE", document_id: target }
   }
 
-  const r = await fetch(`${BASE_URL}${SYNC_ROUTE}`, {
+  const r = await fetch(`${ENDAVA_API_URL}${SYNC_ROUTE}`, {
     method: "POST",
     headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -63,7 +63,7 @@ export const neuroWipe = async (docIds) => {
   const ids = Array.isArray(docIds) ? docIds : [docIds]
   const body = ids.length === 1 ? { document_id: ids[0] } : { document_ids: ids }
 
-  const r = await fetch(`${BASE_URL}${WIPE_ROUTE}`, {
+  const r = await fetch(`${ENDAVA_API_URL}${WIPE_ROUTE}`, {
     method: "POST",
     headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(body),
