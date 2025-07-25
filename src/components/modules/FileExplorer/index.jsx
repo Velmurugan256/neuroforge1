@@ -113,7 +113,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
               treeData={treeData}
               selectedItem={selectedItem}
               onSelect={handleSelect}
-              onRename={renameItem}
+              onRename={(oldPath, newPath) => renameItem(oldPath, newPath, userId, userRole)}
               onDeleteRequest={handleOpenDeleteConfirm}
               onCreateFolder={handleOpenCreateFolderModal}
               onCreateFile={handleOpenCreateFileModal}

@@ -47,30 +47,56 @@ const FolderItem = ({
     ? "bg-cyan-500/10 text-cyan-300"
     : "hover:bg-slate-800/50 text-slate-300 hover:text-slate-100"
 
-  const confirmRename = () => {
-    if (!newName.trim() || newName === item.name) return setIsRenaming(false)
-    const newPath = item.path.split("/").slice(0, -1).concat(newName).join("/")
-    onRename(item.path, newPath)
-    setIsRenaming(false)
-  }
-
   const toggleFolder = () => {
     setIsOpen(!isOpen)
     onSelect(item.path)
+  }
+
+  const confirmRename = () => {
+    if (!newName.trim() || newName === item.name) {
+      setIsRenaming(false)
+      setNewName(item.name)
+      return
+    }
+    const pathParts = item.path.split("/")
+    pathParts[pathParts.length - 1] = newName
+    const newPath = pathParts.join("/")
+    onRename(item.path, newPath)
+    setIsRenaming(false)
   }
 
   return (
     <div className="text-white">
       <div className={`${rowBase} ${rowActive}`}>
         {isRenaming ? (
-          <input
-            className="bg-slate-800 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            value={newName}
-            autoFocus
-            onChange={(e) => setNewName(e.target.value)}
-            onBlur={confirmRename}
-            onKeyDown={(e) => e.key === "Enter" && confirmRename()}
-          />
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              {isOpen ? (
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              )}
+              <span className="text-lg flex-shrink-0">{getIcon(item.name, true, isOpen)}</span>
+            </div>
+            <input
+              className="bg-slate-800/90 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 flex-1 min-w-0"
+              value={newName}
+              autoFocus
+              onChange={(e) => setNewName(e.target.value)}
+              onBlur={confirmRename}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  confirmRename()
+                } else if (e.key === "Escape") {
+                  e.preventDefault()
+                  setIsRenaming(false)
+                  setNewName(item.name)
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
         ) : (
           <div onClick={toggleFolder} className="flex items-center gap-3 min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -132,7 +158,10 @@ const FolderItem = ({
             menuClassName="bg-slate-900 border border-slate-800 rounded-lg shadow-xl min-w-[160px]"
           >
             <MenuItem
-              onClick={() => setIsRenaming(true)}
+              onClick={() => {
+                setIsRenaming(true)
+                setNewName(item.name)
+              }}
               className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
             >
               <Edit className="w-4 h-4" />

@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 import { MoreVertical, Download, Edit, Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -9,6 +10,9 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, use
   const { name, path } = item
   const extension = name.split(".").pop().toLowerCase()
   const isSelected = selectedItem === path
+  
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [newName, setNewName] = useState(name)
 
   const baseClasses =
     "group cursor-pointer flex justify-between items-center px-3 py-2 rounded-lg transition-all duration-200"
@@ -53,11 +57,45 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, use
     }
   }
 
+  const confirmRename = () => {
+    if (!newName.trim() || newName === name) {
+      setIsRenaming(false)
+      setNewName(name)
+      return
+    }
+    const pathParts = path.split("/")
+    pathParts[pathParts.length - 1] = newName
+    const newPath = pathParts.join("/")
+    onRename(path, newPath)
+    setIsRenaming(false)
+  }
+
   return (
-    <div onClick={() => onSelect(path)} onDoubleClick={handleDoubleClick} className={`${baseClasses} ${activeClasses}`}>
-      <span className="font-medium flex items-center gap-3 min-w-0">
+    <div onClick={() => !isRenaming && onSelect(path)} onDoubleClick={!isRenaming ? handleDoubleClick : undefined} className={`${baseClasses} ${activeClasses}`}>
+      <span className="font-medium flex items-center gap-3 min-w-0 flex-1">
         <span className="text-lg flex-shrink-0">{getIcon(name)}</span>
-        <span className="truncate text-sm">{decodeURIComponent(name)}</span>
+        {isRenaming ? (
+          <input
+            className="bg-slate-800/90 text-white border border-cyan-500 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 flex-1 min-w-0"
+            value={newName}
+            autoFocus
+            onChange={(e) => setNewName(e.target.value)}
+            onBlur={confirmRename}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                confirmRename()
+              } else if (e.key === "Escape") {
+                e.preventDefault()
+                setIsRenaming(false)
+                setNewName(name)
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <span className="truncate text-sm">{decodeURIComponent(name)}</span>
+        )}
       </span>
 
       <Menu
@@ -70,11 +108,8 @@ const FileItem = ({ item, selectedItem, onSelect, onRename, onDeleteRequest, use
       >
         <MenuItem
           onClick={() => {
-            const newName = prompt("New file name:", name) // Keeping prompt for rename for now
-            if (newName && path) {
-              const newPath = path.split("/").slice(0, -1).concat(newName).join("/")
-              onRename(path, newPath)
-            }
+            setIsRenaming(true)
+            setNewName(name)
           }}
           className="flex items-center gap-3 px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
         >

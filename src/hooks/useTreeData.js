@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { getS3Tree, createFolder, renameItem as apiRenameItem, deleteItem as apiDeleteItem, deleteFile } from "@/api/files"
+import { getS3Tree, createFolder, renameItem as apiRenameItem, deleteItem as apiDeleteItem, deleteFile, renameFile } from "@/api/files"
 
 const useTreeData = () => {
   const [treeData, setTreeData] = useState([])
@@ -43,10 +43,21 @@ const useTreeData = () => {
     }
   }
 
-  const renamePath = async (oldPath, newPath) => {
+  const renamePath = async (oldPath, newPath, userId, userRole) => {
     try {
-      await apiRenameItem(oldPath, newPath)
-      toast.success("Item renamed successfully")
+      // Check if the path is a file (has an extension) or folder
+      const isFile = oldPath.includes('.') && !oldPath.endsWith('/')
+      
+      if (isFile) {
+        // Use the specific renameFile API for files
+        await renameFile(oldPath, newPath, userId, userRole)
+        toast.success("File renamed successfully", { description: newPath.split('/').pop() })
+      } else {
+        // Use the generic renameItem API for folders
+        await apiRenameItem(oldPath, newPath)
+        toast.success("Folder renamed successfully", { description: newPath.split('/').pop() })
+      }
+      
       fetchTree()
     } catch (err) {
       toast.error("Error renaming item", { description: err.message })
