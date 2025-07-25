@@ -1,23 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSelector, useDispatch } from "react-redux"
 import { toast } from "sonner"
-import useTreeData from "@/hooks/useTreeData"
+import { fetchTreeData, createFolder, deleteFileOrFolder, setSelectedItem } from "@/store/slices/fileTreeSlice"
+import { createFileWithRefresh, uploadFileWithRefresh, renameFileWithRefresh } from "@/store/actions/fileOperations"
 import TreeView from "./TreeView"
 import Breadcrumb from "./Breadcrumb"
 import SideNavHeader from "./SideNavHeader"
-import CreateFolderModal from "./CreateFolderModal"
+import CreateFolderModal from "./CreateFolderModal" 
 import CreateFileModal from "./CreateFileModal"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
-import { uploadFile, createFile } from "@/api"
 
 const SideNav = ({ userId, userRole, onOpenDocument }) => {
-  const { treeData, loading, error, fetchTree, createNewFolder, renameItem, deleteItem } = useTreeData()
+  const dispatch = useDispatch()
+  
+  // Get data from Redux store
+  const { treeData, loading, error, selectedItem, breadcrumb } = useSelector((state) => state.fileTree)
 
-  const [selectedItem, setSelectedItem] = useState(null)
-  const [breadcrumb, setBreadcrumb] = useState([])
-
-  // --- State for all modals ---
+  // Local modal state
   const [isFolderModalOpen, setFolderModalOpen] = useState(false)
   const [isFileModalOpen, setFileModalOpen] = useState(false)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
@@ -25,10 +26,13 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const [modalFileType, setModalFileType] = useState("txt")
   const [confirmModalProps, setConfirmModalProps] = useState({})
 
+  // Load tree data on mount
+  useEffect(() => {
+    dispatch(fetchTreeData())
+  }, [dispatch])
+
   const handleSelect = (path) => {
-    if (!path) return
-    setSelectedItem(path)
-    setBreadcrumb(path.split("/").filter(Boolean))
+    dispatch(setSelectedItem(path))
   }
 
   // --- Modal Logic ---
@@ -41,7 +45,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
 
   const handleConfirmCreateFolder = (newFolderName) => {
     const fullPath = modalParentPath ? `${modalParentPath}/${newFolderName}` : newFolderName
-    createNewFolder(fullPath)
+    dispatch(createFolder({ path: fullPath, userId, userRole }))
   }
 
   const handleOpenCreateFileModal = (parentPath, fileType) => {
@@ -53,9 +57,8 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const handleConfirmCreateFile = async (newFileName) => {
     const fullPath = `${modalParentPath}/${newFileName}.${modalFileType}`
     try {
-      await createFile(fullPath, userId, userRole)
+      await dispatch(createFileWithRefresh({ path: fullPath, userId, userRole })).unwrap()
       toast.success("File created", { description: fullPath })
-      fetchTree()
     } catch (err) {
       toast.error("Failed to create file", { description: err.message })
     }
@@ -66,7 +69,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
       title: "Delete Item",
       message: `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`,
       confirmText: "Delete",
-      onConfirm: () => deleteItem(path, userId, userRole),
+      onConfirm: () => dispatch(deleteFileOrFolder({ path, userId, userRole })),
     })
     setConfirmModalOpen(true)
   }
@@ -75,11 +78,20 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
   const handleUploadFile = async (folderPath, file) => {
     const toastId = toast.loading("Uploading file...", { description: file.name })
     try {
-      await uploadFile(folderPath, file, userId, userRole)
+      await dispatch(uploadFileWithRefresh({ parentPath: folderPath, file, userId, userRole })).unwrap()
       toast.success("Upload successful", { id: toastId, description: file.name })
-      fetchTree()
     } catch (err) {
       toast.error("Upload failed", { id: toastId, description: err.message })
+    }
+  }
+
+  // --- Rename Logic ---
+  const handleRename = async (oldPath, newPath) => {
+    try {
+      await dispatch(renameFileWithRefresh({ oldPath, newPath, userId, userRole })).unwrap()
+      toast.success("Renamed successfully")
+    } catch (err) {
+      toast.error("Rename failed", { description: err.message })
     }
   }
 
@@ -88,7 +100,7 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
       <div className="h-full bg-slate-950 text-white border-r border-slate-800/50">
         <div className="p-4 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600">
           <SideNavHeader
-            onRefresh={fetchTree}
+            onRefresh={() => dispatch(fetchTreeData())}
             loading={loading}
             onAddFolder={() => handleOpenCreateFolderModal(selectedItem || "")}
             bucketName="Explorer"
@@ -113,12 +125,12 @@ const SideNav = ({ userId, userRole, onOpenDocument }) => {
               treeData={treeData}
               selectedItem={selectedItem}
               onSelect={handleSelect}
-              onRename={(oldPath, newPath) => renameItem(oldPath, newPath, userId, userRole)}
+              onRename={handleRename}
               onDeleteRequest={handleOpenDeleteConfirm}
               onCreateFolder={handleOpenCreateFolderModal}
               onCreateFile={handleOpenCreateFileModal}
               onUploadFile={handleUploadFile}
-              onRefresh={fetchTree}
+              onRefresh={() => dispatch(fetchTreeData())}
               userId={userId}
               userRole={userRole}
               onOpenDocument={onOpenDocument}

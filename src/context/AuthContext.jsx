@@ -2,9 +2,11 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux"
 import { jwtDecode } from "jwt-decode"
 import { Loader2 } from "lucide-react"
 import { config, getCognitoLoginUrl, getCognitoLogoutUrl, getCognitoTokenUrl } from "@/config/cognito-config"
+import { setAuth, clearAuth, setLoading } from "@/store/slices/authSlice"
 
 const AuthContext = createContext(null)
 
@@ -15,6 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const signIn = () => {
     window.location.href = getCognitoLoginUrl()
@@ -24,9 +27,10 @@ export const AuthProvider = ({ children }) => {
     console.log("🔧 Signing out user")
     setUser(null)
     setTokens(null)
+    dispatch(clearAuth())
     localStorage.removeItem("cognito_tokens")
     window.location.href = getCognitoLogoutUrl()
-  }, [])
+  }, [dispatch])
 
   const handleRedirectCallback = useCallback(
     async (code) => {
@@ -57,6 +61,7 @@ export const AuthProvider = ({ children }) => {
 
         const decodedUser = jwtDecode(tokenData.id_token)
         setUser(decodedUser)
+        dispatch(setAuth({ user: decodedUser, token: tokenData.access_token }))
         
         console.log("🔧 User authenticated:", decodedUser.email || decodedUser.sub)
 
@@ -69,6 +74,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("cognito_tokens")
         setUser(null)
         setTokens(null)
+        dispatch(clearAuth())
         navigate("/login", { replace: true })
       }
     },
@@ -97,17 +103,20 @@ export const AuthProvider = ({ children }) => {
             if (decodedUser.exp * 1000 > Date.now()) {
               setTokens(parsedTokens)
               setUser(decodedUser)
+              dispatch(setAuth({ user: decodedUser, token: parsedTokens.access_token }))
             } else {
               // Token is expired, clear session
               localStorage.removeItem("cognito_tokens")
               setUser(null)
               setTokens(null)
+              dispatch(clearAuth())
             }
           } catch (error) {
             console.error("Failed to parse stored tokens:", error)
             localStorage.removeItem("cognito_tokens")
             setUser(null)
             setTokens(null)
+            dispatch(clearAuth())
           }
         }
         setIsLoading(false)
@@ -115,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     checkSession()
-  }, [location.search, handleRedirectCallback])
+  }, [location.search, handleRedirectCallback, dispatch])
 
   if (isLoading) {
     return (

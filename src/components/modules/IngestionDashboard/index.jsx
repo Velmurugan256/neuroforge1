@@ -1,109 +1,88 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSelector, useDispatch } from "react-redux"
 import { RefreshCw, Info, Loader2, Activity, TrendingUp, Zap } from "lucide-react"
 import { toast } from "sonner"
-import { fetchRecentActivity, neuroSync, neuroWipe, fileStatus } from "@/api"
+import { fileStatus } from "@/api"
+import { fetchIngestionData, performNeuroSync, performNeuroWipe, setSyncTargets, setWipeTargets } from "@/store/slices/ingestionSlice"
 import MultiDocumentDropdown from "./MultiDocumentDropdown"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 import GetDetailsModal from "./GetDetailsModal"
 
-const LIMIT = 25
-
 export default function RightPanelContainer() {
-  /* ─────────────────── state ─────────────────── */
-  const [stats, setStats] = useState(null)
-  const [activity, setActivity] = useState([])
-
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-
-  const [syncTargets, setSyncTargets] = useState([])
-  const [wipeTargets, setWipeTargets] = useState([])
-
-  const [syncing, setSyncing] = useState(false)
-  const [wiping, setWiping] = useState(false)
-
-  const [refreshTick, setRefreshTick] = useState(0)
+  const dispatch = useDispatch()
+  
+  // Get data from Redux store
+  const { 
+    stats, 
+    activity, 
+    loading, 
+    error,
+    syncing,
+    wiping,
+    syncTargets,
+    wipeTargets,
+    refreshTick
+  } = useSelector((state) => state.ingestion)
 
   const [isConfirmWipeOpen, setConfirmWipeOpen] = useState(false)
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false)
 
   /* ─────────────────── fetch dashboard ─────────────────── */
-  const load = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await fetchRecentActivity(LIMIT)
-      if (data?.stats) {
-        setStats(data.stats)
-        setActivity(data.activity || [])
-      } else if (Array.isArray(data)) {
-        setStats({
-          totalUploaded: data.length,
-          learned: data.filter((d) => d.status === "learned").length,
-          failed: data.filter((d) => d.status === "failed").length,
-          lastUpload: data[0]?.last_modified ?? "—",
-          lastFailed: data.find((d) => d.status === "failed")?.last_modified ?? "—",
-        })
-        setActivity(data)
-      }
-    } catch (e) {
-      console.error(e)
-      setError("Status fetch failed")
-      toast.error("Could not load ingestion stats.")
-    } finally {
-      setLoading(false)
-      setRefreshTick((t) => t + 1)
-    }
+  const load = () => {
+    dispatch(fetchIngestionData())
   }
 
   useEffect(() => {
     load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [dispatch])
+
+  // Auto-refresh when refreshTick changes (triggered by file operations)
+  useEffect(() => {
+    if (refreshTick > 0) {
+      load()
+    }
+  }, [refreshTick])
 
   /* ─────────────────── actions ─────────────────── */
   const handleNeuroSync = async () => {
     if (syncTargets.length === 0) return
-    setSyncing(true)
+    
     const payload = syncTargets.includes("ALL") ? "ALL" : syncTargets
     const toastId = toast.loading("Sending request to NeuroSync...")
+    
     try {
-      await neuroSync(payload)
+      await dispatch(performNeuroSync(payload)).unwrap()
       toast.success(
         payload === "ALL"
           ? "All documents queued for ingestion"
           : `${syncTargets.length} doc${syncTargets.length > 1 ? "s" : ""} queued for ingestion`,
         { id: toastId },
       )
-      setSyncTargets([])
-      await load()
+      dispatch(setSyncTargets([]))
     } catch (e) {
       toast.error("NeuroSync failed", { id: toastId, description: e.message })
-    } finally {
-      setSyncing(false)
     }
   }
 
   const handleNeuroWipe = async () => {
-    setWiping(true)
+    if (wipeTargets.length === 0) return
+    
     const payload = wipeTargets.includes("ALL") ? "ALL" : wipeTargets
-    const toastId = toast.loading("Sending request to NeuroWipe...")
+    const toastId = toast.loading("Processing NeuroWipe request...")
+    
     try {
-      await neuroWipe(payload)
+      await dispatch(performNeuroWipe(payload)).unwrap()
       toast.success(
-        payload === "ALL"
+        payload === "ALL" 
           ? "All documents scheduled for deletion"
           : `${wipeTargets.length} doc${wipeTargets.length > 1 ? "s" : ""} scheduled for deletion`,
         { id: toastId },
       )
-      setWipeTargets([])
-      await load()
+      dispatch(setWipeTargets([]))
     } catch (e) {
       toast.error("NeuroWipe failed", { id: toastId, description: e.message })
-    } finally {
-      setWiping(false)
     }
   }
 
