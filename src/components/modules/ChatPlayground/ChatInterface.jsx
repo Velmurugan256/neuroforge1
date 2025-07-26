@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Send, Bot, User, Loader2, RotateCcw, Settings } from "lucide-react"
 import { toast } from "sonner"
+import { sendQuestionToRAG, formatRAGResponse, getErrorMessage } from "@/api/rag"
 
 const ChatInterface = ({ onClose }) => {
   const [messages, setMessages] = useState([
@@ -38,39 +39,54 @@ const ChatInterface = ({ onClose }) => {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const question = inputValue.trim()
     setInputValue("")
     setIsLoading(true)
 
     try {
-      // Simulate API call - replace with actual bot API
-      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
+      // Call the NeuroForge RAG API
+      const ragResponse = await sendQuestionToRAG(question)
+      
+      // Format the response for display
+      const formattedResponse = formatRAGResponse(ragResponse, question)
 
       const botResponse = {
         id: Date.now() + 1,
         type: "bot",
-        content: generateBotResponse(userMessage.content),
+        content: formattedResponse,
         timestamp: new Date(),
+        ragData: ragResponse, // Store original data for potential future use
       }
 
       setMessages((prev) => [...prev, botResponse])
+      
+      // Show success toast if we got good results
+      if (ragResponse.matches && ragResponse.matches.length > 0) {
+        toast.success(`Found ${ragResponse.matches.length} relevant result${ragResponse.matches.length !== 1 ? 's' : ''}`)
+      }
+      
     } catch (error) {
-      toast.error("Failed to get response", { description: "Please try again" })
+      console.error('RAG API Error:', error)
+      
+      // Create error response message
+      const errorMessage = getErrorMessage(error)
+      const errorResponse = {
+        id: Date.now() + 1,
+        type: "bot",
+        content: `❌ **Error**: ${errorMessage}\n\nPlease try:\n• Rephrasing your question\n• Checking your internet connection\n• Contacting support if the issue persists`,
+        timestamp: new Date(),
+        isError: true,
+      }
+
+      setMessages((prev) => [...prev, errorResponse])
+      
+      // Show error toast
+      toast.error("Failed to get response", { 
+        description: errorMessage.length > 50 ? errorMessage.substring(0, 50) + "..." : errorMessage 
+      })
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const generateBotResponse = (userInput) => {
-    const responses = [
-      "I understand you're asking about: \"" +
-        userInput +
-        '". Based on your uploaded documents, I can help analyze this information.',
-      "That's an interesting question! Let me search through your document knowledge base to provide you with the most relevant information.",
-      "I can help you with that. From what I can see in your files, here are some insights that might be useful...",
-      "Great question! I've analyzed your documents and found some relevant information that addresses your query.",
-      "I'm processing your request about: \"" + userInput + "\". Here's what I found in your document collection...",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
   }
 
   const handleKeyPress = (e) => {
@@ -93,6 +109,25 @@ const ChatInterface = ({ onClose }) => {
 
   const formatTime = (timestamp) => {
     return timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  }
+
+  // Helper function to render formatted message content
+  const renderMessageContent = (message) => {
+    const { content, isError } = message
+    
+    // Basic markdown-like formatting for bot responses
+    let formattedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+      .replace(/📄/g, '📄') // Keep emojis
+      .replace(/🆔/g, '🆔')
+      .replace(/❌/g, '❌')
+
+    return (
+      <div 
+        className={`text-sm leading-relaxed whitespace-pre-wrap ${isError ? 'text-red-100' : ''}`}
+        dangerouslySetInnerHTML={{ __html: formattedContent }}
+      />
+    )
   }
 
   return (
@@ -137,11 +172,25 @@ const ChatInterface = ({ onClose }) => {
 
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                message.type === "user" ? "bg-cyan-600 text-white ml-12" : "bg-slate-800/80 text-slate-100 mr-12"
+                message.type === "user" 
+                  ? "bg-cyan-600 text-white ml-12" 
+                  : message.isError 
+                    ? "bg-red-900/50 border border-red-700/50 text-red-100 mr-12" 
+                    : "bg-slate-800/80 text-slate-100 mr-12"
               }`}
             >
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-              <p className={`text-xs mt-2 ${message.type === "user" ? "text-cyan-100" : "text-slate-400"}`}>
+              {message.type === "user" ? (
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+              ) : (
+                renderMessageContent(message)
+              )}
+              <p className={`text-xs mt-2 ${
+                message.type === "user" 
+                  ? "text-cyan-100" 
+                  : message.isError 
+                    ? "text-red-300" 
+                    : "text-slate-400"
+              }`}>
                 {formatTime(message.timestamp)}
               </p>
             </div>
