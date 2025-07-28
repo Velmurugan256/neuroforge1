@@ -9,15 +9,16 @@ import { fetchIngestionData, performNeuroSync, performNeuroWipe, setSyncTargets,
 import MultiDocumentDropdown from "./MultiDocumentDropdown"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 import GetDetailsModal from "./GetDetailsModal"
+import { createCollection, deleteCollection } from "@/api/vector"
 
 export default function RightPanelContainer() {
   const dispatch = useDispatch()
-  
+
   // Get data from Redux store
-  const { 
-    stats, 
-    activity, 
-    loading, 
+  const {
+    stats,
+    activity,
+    loading,
     error,
     syncing,
     wiping,
@@ -48,10 +49,10 @@ export default function RightPanelContainer() {
   /* ─────────────────── actions ─────────────────── */
   const handleNeuroSync = async () => {
     if (syncTargets.length === 0) return
-    
+
     const payload = syncTargets.includes("ALL") ? "ALL" : syncTargets
     const toastId = toast.loading("Sending request to NeuroSync...")
-    
+
     try {
       await dispatch(performNeuroSync(payload)).unwrap()
       toast.success(
@@ -68,14 +69,14 @@ export default function RightPanelContainer() {
 
   const handleNeuroWipe = async () => {
     if (wipeTargets.length === 0) return
-    
+
     const payload = wipeTargets.includes("ALL") ? "ALL" : wipeTargets
     const toastId = toast.loading("Processing NeuroWipe request...")
-    
+
     try {
       await dispatch(performNeuroWipe(payload)).unwrap()
       toast.success(
-        payload === "ALL" 
+        payload === "ALL"
           ? "All documents scheduled for deletion"
           : `${wipeTargets.length} doc${wipeTargets.length > 1 ? "s" : ""} scheduled for deletion`,
         { id: toastId },
@@ -104,17 +105,21 @@ export default function RightPanelContainer() {
   const handleCreateCollection = async () => {
     const toastId = toast.loading("Creating collection...")
     try {
-      // TODO: Implement create collection API call
+      const result = await createCollection()
       toast.success("Collection created successfully!", { id: toastId })
+      console.log("Collection Result:", result)
     } catch (e) {
-      toast.error("Failed to create collection", { id: toastId, description: e.message })
+      toast.error("Failed to create collection", {
+        id: toastId,
+        description: e.message
+      })
     }
   }
 
   const handleCreateVector = async () => {
     const toastId = toast.loading("Creating vector...")
     try {
-      // TODO: Implement create vector API call
+      const result = await createVector()
       toast.success("Vector created successfully!", { id: toastId })
     } catch (e) {
       toast.error("Failed to create vector", { id: toastId, description: e.message })
@@ -124,8 +129,12 @@ export default function RightPanelContainer() {
   const handleDeleteCollectionLambda = async () => {
     const toastId = toast.loading("Deleting collection lambda...")
     try {
-      // TODO: Implement delete collection lambda API call
-      toast.success("Collection lambda deleted successfully!", { id: toastId })
+      const result = await deleteCollection()
+      if (result?.message) {
+        toast.success(result.message, { id: toastId })
+      } else {
+        toast.success("Collection lambda deleted successfully!", { id: toastId })
+      }
     } catch (e) {
       toast.error("Failed to delete collection lambda", { id: toastId, description: e.message })
     }
@@ -282,13 +291,12 @@ export default function RightPanelContainer() {
                       <div className="flex items-center justify-between gap-4 mb-2">
                         <div className="text-slate-400 text-xs flex-shrink-0">{it.last_modified ?? it.time}</div>
                         <div
-                          className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                            it.status === "learned"
+                          className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${it.status === "learned"
                               ? "bg-emerald-500/20 text-emerald-400"
                               : it.status === "failed"
                                 ? "bg-red-500/20 text-red-400"
                                 : "bg-blue-500/20 text-blue-400"
-                          }`}
+                            }`}
                         >
                           {it.status}
                         </div>
@@ -316,7 +324,7 @@ export default function RightPanelContainer() {
                     <Database className="w-4 h-4" />
                     Create Collection
                   </button>
-                  
+
                   <button
                     onClick={handleCreateVector}
                     className="bg-green-600 hover:bg-green-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/30 flex items-center justify-center gap-2"
@@ -324,7 +332,7 @@ export default function RightPanelContainer() {
                     <Network className="w-4 h-4" />
                     Create Vector
                   </button>
-                  
+
                   <button
                     onClick={handleDeleteCollectionLambda}
                     className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center justify-center gap-2"
@@ -343,9 +351,8 @@ export default function RightPanelContainer() {
         onClose={() => setConfirmWipeOpen(false)}
         onConfirm={handleNeuroWipe}
         title="Confirm NeuroWipe"
-        message={`Are you sure you want to wipe ${
-          wipeTargets.includes("ALL") ? "ALL documents" : `${wipeTargets.length} document(s)`
-        }? This action is irreversible.`}
+        message={`Are you sure you want to wipe ${wipeTargets.includes("ALL") ? "ALL documents" : `${wipeTargets.length} document(s)`
+          }? This action is irreversible.`}
         confirmText="Wipe Documents"
       />
       <GetDetailsModal
