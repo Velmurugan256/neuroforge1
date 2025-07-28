@@ -9,7 +9,7 @@ import { fetchIngestionData, performNeuroSync, performNeuroWipe, setSyncTargets,
 import MultiDocumentDropdown from "./MultiDocumentDropdown"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 import GetDetailsModal from "./GetDetailsModal"
-import { createCollection, deleteCollection } from "@/api/vector"
+import { createCollection, deleteCollection, getCollectionsStatus } from "@/api/vector"
 
 export default function RightPanelContainer() {
   const dispatch = useDispatch()
@@ -29,14 +29,30 @@ export default function RightPanelContainer() {
 
   const [isConfirmWipeOpen, setConfirmWipeOpen] = useState(false)
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false)
+  const [collectionStatus, setCollectionStatus] = useState(null)
+  const [loadingCollection, setLoadingCollection] = useState(false)
 
   /* ─────────────────── fetch dashboard ─────────────────── */
   const load = () => {
     dispatch(fetchIngestionData())
   }
 
+  const loadCollectionStatus = async () => {
+    setLoadingCollection(true)
+    try {
+      const status = await getCollectionsStatus()
+      setCollectionStatus(status)
+    } catch (error) {
+      console.error("Failed to fetch collection status:", error)
+      setCollectionStatus(null)
+    } finally {
+      setLoadingCollection(false)
+    }
+  }
+
   useEffect(() => {
     load()
+    loadCollectionStatus()
   }, [dispatch])
 
   // Auto-refresh when refreshTick changes (triggered by file operations)
@@ -108,6 +124,8 @@ export default function RightPanelContainer() {
       const result = await createCollection()
       toast.success("Collection created successfully!", { id: toastId })
       console.log("Collection Result:", result)
+      // Refresh collection status after creation
+      await loadCollectionStatus()
     } catch (e) {
       toast.error("Failed to create collection", {
         id: toastId,
@@ -135,6 +153,8 @@ export default function RightPanelContainer() {
       } else {
         toast.success("Collection lambda deleted successfully!", { id: toastId })
       }
+      // Refresh collection status after deletion
+      await loadCollectionStatus()
     } catch (e) {
       toast.error("Failed to delete collection lambda", { id: toastId, description: e.message })
     }
@@ -311,15 +331,56 @@ export default function RightPanelContainer() {
 
               {/* Collection Management */}
               <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Database className="w-5 h-5 text-cyan-400" />
-                  Collection Management
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Database className="w-5 h-5 text-cyan-400" />
+                    Collection Management
+                  </h3>
+                  <button
+                    onClick={loadCollectionStatus}
+                    title="Refresh Collection Status"
+                    className="bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-cyan-400 p-2 rounded-lg transition-all duration-200 border border-slate-700/50"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${loadingCollection ? "animate-spin" : ""}`} />
+                  </button>
+                </div>
+
+                {/* Collection Status */}
+                {loadingCollection ? (
+                  <div className="flex items-center gap-2 text-slate-400 text-sm mb-4">
+                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                    Loading collection status...
+                  </div>
+                ) : collectionStatus ? (
+                  <div className="bg-slate-800/50 rounded-lg p-3 mb-4 border border-slate-700">
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <div className="text-slate-300 font-medium">{collectionStatus.collection_name}</div>
+                      <div
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          collectionStatus.status === "ACTIVE"
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {collectionStatus.status}
+                      </div>
+                    </div>
+                    <div className="text-slate-400 text-sm">
+                      <div>ID: {collectionStatus.collection_id}</div>
+                      <div className="truncate">ARN: {collectionStatus.arn}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-800/50 rounded-lg p-3 mb-4 border border-slate-700 text-center text-slate-400">
+                    No collection status available
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={handleCreateCollection}
-                    className="bg-blue-600 hover:bg-blue-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 flex items-center justify-center gap-2"
+                    disabled={collectionStatus?.status === "ACTIVE"}
+                    className="bg-blue-600 hover:bg-blue-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
                   >
                     <Database className="w-4 h-4" />
                     Create Collection
@@ -335,10 +396,11 @@ export default function RightPanelContainer() {
 
                   <button
                     onClick={handleDeleteCollectionLambda}
-                    className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center justify-center gap-2"
+                    disabled={collectionStatus?.status !== "ACTIVE"}
+                    className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-600"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete Collection Lambda
+                    Delete Collection
                   </button>
                 </div>
               </div>
