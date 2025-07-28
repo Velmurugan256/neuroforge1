@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getS3Tree as apiFetchTree, createFolder as apiCreateFolder, deleteItem as apiDeleteItem } from '@/api'
+import { getS3Tree as apiFetchTree, createFolder as apiCreateFolder, deleteItem as apiDeleteItem, deleteFile as apiDeleteFile } from '@/api'
 
 // Helper function to inject paths into tree nodes
 const injectPaths = (node, parentPath = "") => {
@@ -44,11 +44,21 @@ export const deleteFileOrFolder = createAsyncThunk(
   'fileTree/deleteFileOrFolder',
   async ({ path, userId, userRole }, { dispatch, rejectWithValue }) => {
     try {
-      await apiDeleteItem(path, userId, userRole)
+      // Check if the path is a file (has an extension) or folder
+      const isFile = path.includes('.') && !path.endsWith('/')
+      
+      if (isFile) {
+        // Use the specific deleteFile API for files
+        await apiDeleteFile(path, userId, userRole)
+      } else {
+        // Use the generic deleteItem API for folders
+        await apiDeleteItem(path)
+      }
+      
       // Refresh tree and ingestion data after deletion
       dispatch(fetchTreeData())
       dispatch({ type: 'ingestion/refreshData' })
-      return path
+      return { path, isFile }
     } catch (error) {
       return rejectWithValue(error.message)
     }
