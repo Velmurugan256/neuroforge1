@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { FilePlus, FolderPlus, Upload, ChevronRight, ChevronDown, Edit, Trash2, MoreVertical } from "lucide-react"
 import { Menu, MenuItem, MenuButton } from "@szhsin/react-menu"
 
@@ -27,18 +27,8 @@ const FolderItem = ({
   const [newName, setNewName] = useState(item.name)
   const isSelected = selectedItem === item.path
 
-  const fileInputRef = useRef(null)
-  const handleUploadClick = () => fileInputRef.current?.click()
-  const handleFileSelected = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    try {
-      await onUploadFile?.(item.path, file)
-    } catch (err) {
-      // Error is handled by the parent component's toast
-    } finally {
-      e.target.value = ""
-    }
+  const handleUploadClick = () => {
+    onUploadFile?.(item.path)
   }
 
   const rowBase =
@@ -177,8 +167,6 @@ const FolderItem = ({
           </Menu>
         </div>
       </div>
-
-      <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelected} />
 
       {isOpen && (
         <div className="ml-6 mt-2 space-y-1 border-l border-slate-800 pl-4">

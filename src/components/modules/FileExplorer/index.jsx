@@ -10,6 +10,7 @@ import Breadcrumb from "./Breadcrumb"
 import SideNavHeader from "./SideNavHeader"
 import CreateFolderModal from "./CreateFolderModal" 
 import CreateFileModal from "./CreateFileModal"
+import UploadFileModal from "./UploadFileModal"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 
 const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
@@ -21,6 +22,7 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
   // Local modal state
   const [isFolderModalOpen, setFolderModalOpen] = useState(false)
   const [isFileModalOpen, setFileModalOpen] = useState(false)
+  const [isUploadModalOpen, setUploadModalOpen] = useState(false)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
   const [modalParentPath, setModalParentPath] = useState("")
   const [modalFileType, setModalFileType] = useState("txt")
@@ -75,6 +77,11 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
   }
 
   // --- Upload Logic ---
+  const handleOpenUploadModal = (folderPath) => {
+    setModalParentPath(folderPath || "")
+    setUploadModalOpen(true)
+  }
+
   const handleUploadFile = async (folderPath, file) => {
     const toastId = toast.loading("Uploading file...", { description: file.name })
     try {
@@ -130,7 +137,7 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
               onDeleteRequest={handleOpenDeleteConfirm}
               onCreateFolder={handleOpenCreateFolderModal}
               onCreateFile={handleOpenCreateFileModal}
-              onUploadFile={handleUploadFile}
+              onUploadFile={handleOpenUploadModal}
               onRefresh={() => dispatch(fetchTreeData())}
               userId={userId}
               userRole={userRole}
@@ -153,6 +160,12 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
         onSubmit={handleConfirmCreateFile}
         parentPath={modalParentPath}
         fileType={modalFileType}
+      />
+      <UploadFileModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onSubmit={handleUploadFile}
+        parentPath={modalParentPath}
       />
       <ConfirmationModal
         isOpen={isConfirmModalOpen}
