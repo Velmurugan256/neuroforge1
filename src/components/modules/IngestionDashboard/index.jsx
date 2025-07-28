@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { RefreshCw, Info, Loader2, Activity, TrendingUp, Zap } from "lucide-react"
+import { RefreshCw, Info, Loader2, Activity, TrendingUp, Zap, Database, Network, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { fileStatus } from "@/api"
 import { fetchIngestionData, performNeuroSync, performNeuroWipe, setSyncTargets, setWipeTargets } from "@/store/slices/ingestionSlice"
@@ -97,6 +97,37 @@ export default function RightPanelContainer() {
       })
     } catch (e) {
       toast.error("Failed to get file status", { id: toastId, description: e.message })
+    }
+  }
+
+  /* ─────────────────── collection management handlers ─────────────────── */
+  const handleCreateCollection = async () => {
+    const toastId = toast.loading("Creating collection...")
+    try {
+      // TODO: Implement create collection API call
+      toast.success("Collection created successfully!", { id: toastId })
+    } catch (e) {
+      toast.error("Failed to create collection", { id: toastId, description: e.message })
+    }
+  }
+
+  const handleCreateVector = async () => {
+    const toastId = toast.loading("Creating vector...")
+    try {
+      // TODO: Implement create vector API call
+      toast.success("Vector created successfully!", { id: toastId })
+    } catch (e) {
+      toast.error("Failed to create vector", { id: toastId, description: e.message })
+    }
+  }
+
+  const handleDeleteCollectionLambda = async () => {
+    const toastId = toast.loading("Deleting collection lambda...")
+    try {
+      // TODO: Implement delete collection lambda API call
+      toast.success("Collection lambda deleted successfully!", { id: toastId })
+    } catch (e) {
+      toast.error("Failed to delete collection lambda", { id: toastId, description: e.message })
     }
   }
 
@@ -267,6 +298,40 @@ export default function RightPanelContainer() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Collection Management */}
+              <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Database className="w-5 h-5 text-cyan-400" />
+                  Collection Management
+                </h3>
+
+                <div className="grid grid-cols-1 gap-3">
+                  <button
+                    onClick={handleCreateCollection}
+                    className="bg-blue-600 hover:bg-blue-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 flex items-center justify-center gap-2"
+                  >
+                    <Database className="w-4 h-4" />
+                    Create Collection
+                  </button>
+                  
+                  <button
+                    onClick={handleCreateVector}
+                    className="bg-green-600 hover:bg-green-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/30 flex items-center justify-center gap-2"
+                  >
+                    <Network className="w-4 h-4" />
+                    Create Vector
+                  </button>
+                  
+                  <button
+                    onClick={handleDeleteCollectionLambda}
+                    className="bg-red-600 hover:bg-red-500 py-2.5 px-4 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center justify-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Collection Lambda
+                  </button>
                 </div>
               </div>
             </>
