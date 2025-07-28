@@ -56,8 +56,14 @@ export const sendQuestionToRAG = async (question) => {
       throw new Error('Invalid response format from RAG API')
     }
 
-    if (!Array.isArray(data.matches)) {
-      throw new Error('Invalid response: missing or invalid matches array')
+    // Validate that we have either an answer or matches (or both)
+    if (!data.answer && !Array.isArray(data.matches)) {
+      throw new Error('Invalid response: missing both answer and matches')
+    }
+
+    // If matches exist, validate they're in an array
+    if (data.matches && !Array.isArray(data.matches)) {
+      throw new Error('Invalid response: matches must be an array')
     }
 
     return data
@@ -93,12 +99,47 @@ export const sendQuestionToRAG = async (question) => {
  * @returns {string} - Formatted response text
  */
 export const formatRAGResponse = (ragResponse, originalQuestion) => {
-  if (!ragResponse || !ragResponse.matches || ragResponse.matches.length === 0) {
+  if (!ragResponse) {
     return `I couldn't find any relevant information for "${originalQuestion}". Please try rephrasing your question or check if the documents contain the information you're looking for.`
   }
 
-  const { matches, used_url } = ragResponse
+  const { answer, matches, used_url } = ragResponse
   
+  // If we have a direct answer, use it as the primary response
+  if (answer && typeof answer === 'string' && answer.trim()) {
+    let response = `**Answer**: ${answer}\n\n`
+    
+    // Add supporting matches if available
+    if (matches && Array.isArray(matches) && matches.length > 0) {
+      response += `**Supporting Sources**:\n\n`
+      
+      matches.forEach((match, index) => {
+        const { score, doc_id, metadata } = match
+        const confidence = Math.round(score * 100)
+        
+        response += `${index + 1}. **${doc_id}** (${confidence}% relevance)`
+        
+        if (metadata) {
+          if (metadata.source) {
+            response += ` - ${metadata.source}`
+          }
+          if (metadata.page) {
+            response += ` (Page ${metadata.page})`
+          }
+        }
+        response += `\n`
+      })
+      response += `\n`
+    }
+    
+    return response
+  }
+  
+  // Fallback to original format if no answer is provided
+  if (!matches || !Array.isArray(matches) || matches.length === 0) {
+    return `I couldn't find any relevant information for "${originalQuestion}". Please try rephrasing your question or check if the documents contain the information you're looking for.`
+  }
+
   let response = `Based on your question "${originalQuestion}", here's what I found:\n\n`
 
   matches.forEach((match, index) => {
@@ -106,7 +147,9 @@ export const formatRAGResponse = (ragResponse, originalQuestion) => {
     const confidence = Math.round(score * 100)
     
     response += `**Result ${index + 1}** (${confidence}% relevance):\n`
-    response += `${text}\n\n`
+    if (text) {
+      response += `${text}\n\n`
+    }
     
     if (metadata) {
       response += `📄 **Source**: ${metadata.source || 'Unknown document'}`
@@ -115,16 +158,13 @@ export const formatRAGResponse = (ragResponse, originalQuestion) => {
       }
       response += `\n`
       response += `🆔 **Document ID**: ${doc_id}\n\n`
+    } else {
+      response += `🆔 **Document ID**: ${doc_id}\n\n`
     }
     
     response += '---\n\n'
   })
 
-  // Add metadata information
-  if (used_url) {
-    response += `*Query processed via: ${used_url}*\n`
-  }
-  
   response += `*Found ${matches.length} relevant result${matches.length !== 1 ? 's' : ''} from your document collection.*`
 
   return response
