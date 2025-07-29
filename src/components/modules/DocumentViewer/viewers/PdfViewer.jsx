@@ -52,7 +52,6 @@ const PdfViewer = ({ content, fileUrl, fileName = "document.pdf" }) => {
   }
 
   const onDocumentLoadError = (error) => {
-    console.error("PDF load error:", error)
     setError("Failed to load PDF document")
     setLoading(false)
   }
