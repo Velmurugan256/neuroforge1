@@ -11,6 +11,7 @@ import MobileNav from "../components/layout/MobileNav.jsx"
 import PlaygroundButton from "../components/modules/ChatPlayground/PlaygroundButton.jsx"
 import { useAuth } from "@/context/AuthContext.jsx"
 import { useMediaQuery } from "@/hooks/useMediaQuery.js"
+import Loader from "../components/ui/Loader.jsx"
 
 function DashboardPage() {
   const { user } = useAuth()
@@ -121,8 +122,8 @@ function DashboardPage() {
       ) : (
         <div className="p-8 overflow-y-auto bg-slate-950 h-full flex items-center justify-center">
           <div className="text-center max-w-md animate-fade-in">
-            <div className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-cyan-500/20">
-              <span className="text-4xl">🧠</span>
+            <div className="flex items-center justify-center mx-auto mb-6">
+              <Loader />
             </div>
             <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Welcome to NeuroForge
