@@ -4,9 +4,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { useLocation, useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import { jwtDecode } from "jwt-decode"
-import { Loader2 } from "lucide-react"
 import { config, getCognitoLoginUrl, getCognitoLogoutUrl, getCognitoTokenUrl } from "@/config/cognito-config"
 import { setAuth, clearAuth, setLoading } from "@/store/slices/authSlice"
+import AuthLoader from "../components/ui/AuthLoader.jsx"
 
 const AuthContext = createContext(null)
 
@@ -129,8 +129,8 @@ export const AuthProvider = ({ children }) => {
   if (isLoading) {
     return (
       <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
-        <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mb-4" />
-        <p className="text-lg text-slate-300">Initializing Session...</p>
+        <AuthLoader />
+        <p className="text-lg text-slate-300 mt-4">Initializing Session...</p>
       </div>
     )
   }
