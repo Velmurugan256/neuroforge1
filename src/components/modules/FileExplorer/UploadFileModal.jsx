@@ -7,7 +7,7 @@ const UploadFileModal = ({ isOpen, onClose, onSubmit, parentPath }) => {
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef(null)
 
-  const allowedExtensions = ['pdf', 'txt', 'json']
+  const allowedExtensions = ['pdf', 'txt', 'json', 'docx', 'xlsx', 'xls', 'csv']
   const maxFileSize = 10 * 1024 * 1024 // 10MB
 
   const handleReset = () => {
