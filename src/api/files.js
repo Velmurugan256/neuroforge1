@@ -198,7 +198,17 @@ export const readFileContent = async (path, userId, userRole) => {
     }
   }
 
-  if (res.status !== "success" || !res.content) {
+  if (res.status !== "success") {
+    throw new Error(res.message || "File read failed");
+  }
+
+  // For PDF files, return the pre-signed URL if available
+  if (res.file_url && path.toLowerCase().endsWith('.pdf')) {
+    return res.file_url;
+  }
+
+  // For other files, return content as before
+  if (!res.content) {
     throw new Error(res.message || "File content missing");
   }
 

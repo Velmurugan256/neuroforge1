@@ -21,7 +21,12 @@ const DocumentPanel = ({ document, onClose }) => {
       case "json":
         return <JsonTableViewer content={content} filePath={path} />
       case "pdf":
-        return <PdfViewer fileUrl={content} filePath={path} />
+        // For PDFs, content is now the URL (new API) or base64 content (old API)
+        if (typeof content === "string" && content.startsWith("http")) {
+          return <PdfViewer fileUrl={content} filePath={path} />
+        } else {
+          return <PdfViewer content={content} filePath={path} />
+        }
       case "docx":
         return <DocxViewer fileUrl={content} filePath={path} />
       case "xlsx":
