@@ -32,17 +32,16 @@ export const fetchDocStatusMap = async (limit = 1000) => {
 /**
  * (Re)ingest documents via NeuroSync-Master.
  * @param {"ALL"|string|string[]} target
- * @param {"INGEST"|"RETRY"|"RESUME"|null} action
+ * @param {"INGEST"|"RETRY"|"RESUME"} action
  */
-export const neuroSync = async (target = "ALL", action = null) => {
+export const neuroSync = async (target = "ALL", action = "INGEST") => {
   let body
   if (Array.isArray(target)) {
-    body = { document_ids: target }
+    body = { action, document_ids: target }
   } else if (target === "ALL") {
-    body = { scope: "ALL" }
-    if (action) body.action = action
+    body = { action, scope: "ALL" }
   } else {
-    body = { scope: "SINGLE", document_id: target }
+    body = { action, document_ids: [target] }
   }
 
   const r = await fetch(`${ENDAVA_API_URL}${SYNC_ROUTE}`, {
