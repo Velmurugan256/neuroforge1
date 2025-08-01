@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Title>NeuroForge API Documentation</Title>
+  <Author>GitHub Copilot</Author>
+  <Created>2025-08-01T00:00:00Z</Created>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Header">
+   <Interior ss:Color="#4472C4" ss:Pattern="Solid"/>
+   <Font ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Data">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Alignment ss:WrapText="1" ss:Vertical="Top"/>
+  </Style>
+  <Style ss:ID="Endpoint">
+   <Interior ss:Color="#E7F3FF" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Alignment ss:WrapText="1" ss:Vertical="Top"/>
+  </Style>
+  <Style ss:ID="GET">
+   <Interior ss:Color="#D4F6D4" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Alignment ss:WrapText="1" ss:Vertical="Top"/>
+  </Style>
+  <Style ss:ID="POST">
+   <Interior ss:Color="#FFE6CC" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Alignment ss:WrapText="1" ss:Vertical="Top"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="API Documentation">
+  <Table>
+   <Column ss:Width="120"/>
+   <Column ss:Width="200"/>
+   <Column ss:Width="60"/>
+   <Column ss:Width="250"/>
+   <Column ss:Width="200"/>
+   <Column ss:Width="300"/>
+   <Column ss:Width="200"/>
+   <Column ss:Width="250"/>
+   <Column ss:Width="150"/>
+   <Row>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">API Name</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Endpoint</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Method</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Description</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Parameters</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Request Payload</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Response Format</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Example Usage</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Status Codes</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fetchRecentActivity</Data></Cell>
+    <Cell ss:StyleID="Endpoint"><Data ss:Type="String">{ENDAVA_API_URL}/status/list</Data></Cell>
+    <Cell ss:StyleID="GET"><Data ss:Type="String">GET</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Fetches recent activity records with optional status filtering and configurable result limit</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">• limit (number, optional): Maximum rows to return (default: 25)&#10;• status (string, optional): Filter by specific status</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Query Parameters:&#10;?limit=25&amp;status=COMPLETED</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">JSON array of activity records with document_id, status, timestamp, etc.</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fetchRecentActivity(50, 'COMPLETED')&#10;fetchRecentActivity(100)&#10;fetchRecentActivity()</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">200: Success&#10;400: Bad Request&#10;401: Unauthorized&#10;500: Server Error</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fetchDocStatusMap</Data></Cell>
+    <Cell ss:StyleID="Endpoint"><Data ss:Type="String">{ENDAVA_API_URL}/status/list</Data></Cell>
+    <Cell ss:StyleID="GET"><Data ss:Type="String">GET</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Returns a mapping object where keys are document IDs and values are their current status</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">• limit (number, optional): Maximum rows to pull (default: 1000)</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Query Parameters:&#10;?limit=1000</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Object: { "doc1.pdf": "COMPLETED", "doc2.txt": "PROCESSING", ... }</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fetchDocStatusMap(500)&#10;fetchDocStatusMap()</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">200: Success&#10;400: Bad Request&#10;401: Unauthorized&#10;500: Server Error</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">neuroSync</Data></Cell>
+    <Cell ss:StyleID="Endpoint"><Data ss:Type="String">{ENDAVA_API_URL}/NeuroSync</Data></Cell>
+    <Cell ss:StyleID="POST"><Data ss:Type="String">POST</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">(Re)ingest documents via NeuroSync-Master. Supports processing all documents, single document, or multiple specific documents</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">• target ("ALL" | string | string[], default: "ALL"): Documents to process&#10;• action ("INGEST" | "RETRY" | "RESUME", default: "INGEST"): Processing action</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">ALL documents:&#10;{&#10;  "action": "INGEST",&#10;  "scope": "ALL"&#10;}&#10;&#10;Multiple documents:&#10;{&#10;  "action": "INGEST", &#10;  "document_ids": ["file1.json", "file2.txt"]&#10;}&#10;&#10;Single document:&#10;{&#10;  "action": "INGEST",&#10;  "document_ids": ["filename.txt"]&#10;}</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">JSON response with operation status and details</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">neuroSync("ALL", "INGEST")&#10;neuroSync(["doc1.pdf", "doc2.txt"], "RETRY")&#10;neuroSync("single-doc.json", "RESUME")</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">200: Success&#10;400: Bad Request&#10;401: Unauthorized&#10;500: Server Error</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">neuroWipe</Data></Cell>
+    <Cell ss:StyleID="Endpoint"><Data ss:Type="String">{ENDAVA_API_URL}/NeuroWipe</Data></Cell>
+    <Cell ss:StyleID="POST"><Data ss:Type="String">POST</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Deletes one or more vector documents from the system permanently</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">• docIds (string | string[], required): Document ID(s) to delete</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Single document:&#10;{&#10;  "document_id": "filename.txt"&#10;}&#10;&#10;Multiple documents:&#10;{&#10;  "document_ids": ["file1.json", "file2.txt"]&#10;}</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">JSON response with deletion status and affected document count</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">neuroWipe("single-doc.pdf")&#10;neuroWipe(["doc1.json", "doc2.txt", "doc3.xlsx"])</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">200: Success&#10;400: Bad Request&#10;401: Unauthorized&#10;404: Document Not Found&#10;500: Server Error</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fileStatus</Data></Cell>
+    <Cell ss:StyleID="Endpoint"><Data ss:Type="String">{ENDAVA_API_URL}/filestatus_DB/Get</Data></Cell>
+    <Cell ss:StyleID="GET"><Data ss:Type="String">GET</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Retrieves the latest processing status and metadata for a specific document by its ID</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">• documentId (string, required): The document identifier to check status for</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Query Parameters:&#10;?document_id=my-document.pdf</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">JSON object with document status, processing details, timestamps, etc.</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">fileStatus("my-document.pdf")&#10;fileStatus("report-2024.xlsx")</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">200: Success&#10;400: Bad Request (missing document_id)&#10;401: Unauthorized&#10;404: Document Not Found&#10;500: Server Error</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+ <Worksheet ss:Name="Authentication &amp; Config">
+  <Table>
+   <Column ss:Width="200"/>
+   <Column ss:Width="400"/>
+   <Row>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Configuration Item</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Details</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Authentication</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">All APIs require authentication headers provided by getAuthHeaders() function</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Base URL</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">ENDAVA_API_URL from constants configuration</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Content-Type</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">application/json (for POST requests)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">Error Handling</Data></Cell>
+    <Cell ss:StyleID="Data"><Data ss:Type="String">All functions throw errors with descriptive messages when requests fail. Always wrap API calls in try-catch blocks.</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

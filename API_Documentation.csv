@@ -1,0 +1,50 @@
+API Name,Endpoint,Method,Description,Request Payload,Response,Parameters,Example Usage,Status Codes
+fetchRecentActivity,{ENDAVA_API_URL}/status/list,GET,"Fetches recent activity with optional status filtering and limit","Query Parameters: 
+- limit (number): max rows (default: 25)
+- status (string): optional status filter","JSON array of activity records","limit: number (optional, default: 25)
+status: string (optional)","fetchRecentActivity(50, 'COMPLETED')","200: Success
+4xx: Client Error
+5xx: Server Error"
+fetchDocStatusMap,{ENDAVA_API_URL}/status/list,GET,"Returns an object keyed by document_id → status mapping","Query Parameters:
+- limit (number): max rows (default: 1000)","Object with document_id as keys and status as values","limit: number (optional, default: 1000)","fetchDocStatusMap(500)","200: Success
+4xx: Client Error
+5xx: Server Error"
+neuroSync,{ENDAVA_API_URL}/NeuroSync,POST,"(Re)ingest documents via NeuroSync-Master. Supports ALL documents, single document, or multiple documents","For ALL documents:
+{
+  ""action"": ""INGEST"",
+  ""scope"": ""ALL""
+}
+
+For multiple documents:
+{
+  ""action"": ""INGEST"",
+  ""document_ids"": [""file1.json"", ""file2.txt""]
+}
+
+For single document:
+{
+  ""action"": ""INGEST"",
+  ""document_ids"": [""filename.txt""]
+}","JSON response with operation status","target: ""ALL"" | string | string[] (default: ""ALL"")
+action: ""INGEST"" | ""RETRY"" | ""RESUME"" (default: ""INGEST"")","neuroSync(""ALL"", ""INGEST"")
+neuroSync([""doc1.pdf"", ""doc2.txt""], ""RETRY"")
+neuroSync(""single-doc.json"", ""RESUME"")","200: Success
+4xx: Client Error
+5xx: Server Error"
+neuroWipe,{ENDAVA_API_URL}/NeuroWipe,POST,"Deletes one or more vector documents from the system","For single document:
+{
+  ""document_id"": ""filename.txt""
+}
+
+For multiple documents:
+{
+  ""document_ids"": [""file1.json"", ""file2.txt""]
+}","JSON response with deletion status","docIds: string | string[] (required)","neuroWipe(""single-doc.pdf"")
+neuroWipe([""doc1.json"", ""doc2.txt""])","200: Success
+4xx: Client Error
+5xx: Server Error"
+fileStatus,{ENDAVA_API_URL}/filestatus_DB/Get,GET,"Get latest status for a single document by document ID","Query Parameters:
+- document_id (string): the document identifier","JSON response with document status information","documentId: string (required)","fileStatus(""my-document.pdf"")","200: Success
+400: Bad Request (missing document_id)
+4xx: Client Error
+5xx: Server Error"

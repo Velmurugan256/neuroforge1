@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>NeuroForge API Documentation</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #4472C4; color: white; font-weight: bold; }
+        .endpoint { background-color: #E7F3FF; }
+        .method-get { background-color: #D4F6D4; }
+        .method-post { background-color: #FFE6CC; }
+        .payload { background-color: #F5F5F5; font-family: monospace; white-space: pre-wrap; }
+        .description { max-width: 300px; }
+        .example { font-family: monospace; background-color: #F8F8F8; }
+    </style>
+</head>
+<body>
+    <h1>NeuroForge API Documentation</h1>
+    <h2>Ingestion Service APIs</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>API Name</th>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Description</th>
+                <th>Parameters</th>
+                <th>Request Payload</th>
+                <th>Response Format</th>
+                <th>Example Usage</th>
+                <th>Status Codes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>fetchRecentActivity</strong></td>
+                <td class="endpoint">{ENDAVA_API_URL}/status/list</td>
+                <td class="method-get">GET</td>
+                <td class="description">Fetches recent activity records with optional status filtering and configurable result limit</td>
+                <td>
+                    • <strong>limit</strong> (number, optional): Maximum rows to return (default: 25)<br>
+                    • <strong>status</strong> (string, optional): Filter by specific status
+                </td>
+                <td class="payload">Query Parameters:
+?limit=25&status=COMPLETED</td>
+                <td>JSON array of activity records with document_id, status, timestamp, etc.</td>
+                <td class="example">fetchRecentActivity(50, 'COMPLETED')
+fetchRecentActivity(100)
+fetchRecentActivity()</td>
+                <td>200: Success<br>400: Bad Request<br>401: Unauthorized<br>500: Server Error</td>
+            </tr>
+            <tr>
+                <td><strong>fetchDocStatusMap</strong></td>
+                <td class="endpoint">{ENDAVA_API_URL}/status/list</td>
+                <td class="method-get">GET</td>
+                <td class="description">Returns a mapping object where keys are document IDs and values are their current status</td>
+                <td>
+                    • <strong>limit</strong> (number, optional): Maximum rows to pull (default: 1000)
+                </td>
+                <td class="payload">Query Parameters:
+?limit=1000</td>
+                <td>Object: { "doc1.pdf": "COMPLETED", "doc2.txt": "PROCESSING", ... }</td>
+                <td class="example">fetchDocStatusMap(500)
+fetchDocStatusMap()</td>
+                <td>200: Success<br>400: Bad Request<br>401: Unauthorized<br>500: Server Error</td>
+            </tr>
+            <tr>
+                <td><strong>neuroSync</strong></td>
+                <td class="endpoint">{ENDAVA_API_URL}/NeuroSync</td>
+                <td class="method-post">POST</td>
+                <td class="description">(Re)ingest documents via NeuroSync-Master. Supports processing all documents, single document, or multiple specific documents</td>
+                <td>
+                    • <strong>target</strong> ("ALL" | string | string[], default: "ALL"): Documents to process<br>
+                    • <strong>action</strong> ("INGEST" | "RETRY" | "RESUME", default: "INGEST"): Processing action
+                </td>
+                <td class="payload">ALL documents:
+{
+  "action": "INGEST",
+  "scope": "ALL"
+}
+
+Multiple documents:
+{
+  "action": "INGEST", 
+  "document_ids": ["file1.json", "file2.txt"]
+}
+
+Single document:
+{
+  "action": "INGEST",
+  "document_ids": ["filename.txt"]
+}</td>
+                <td>JSON response with operation status and details</td>
+                <td class="example">neuroSync("ALL", "INGEST")
+neuroSync(["doc1.pdf", "doc2.txt"], "RETRY")
+neuroSync("single-doc.json", "RESUME")</td>
+                <td>200: Success<br>400: Bad Request<br>401: Unauthorized<br>500: Server Error</td>
+            </tr>
+            <tr>
+                <td><strong>neuroWipe</strong></td>
+                <td class="endpoint">{ENDAVA_API_URL}/NeuroWipe</td>
+                <td class="method-post">POST</td>
+                <td class="description">Deletes one or more vector documents from the system permanently</td>
+                <td>
+                    • <strong>docIds</strong> (string | string[], required): Document ID(s) to delete
+                </td>
+                <td class="payload">Single document:
+{
+  "document_id": "filename.txt"
+}
+
+Multiple documents:
+{
+  "document_ids": ["file1.json", "file2.txt"]
+}</td>
+                <td>JSON response with deletion status and affected document count</td>
+                <td class="example">neuroWipe("single-doc.pdf")
+neuroWipe(["doc1.json", "doc2.txt", "doc3.xlsx"])</td>
+                <td>200: Success<br>400: Bad Request<br>401: Unauthorized<br>404: Document Not Found<br>500: Server Error</td>
+            </tr>
+            <tr>
+                <td><strong>fileStatus</strong></td>
+                <td class="endpoint">{ENDAVA_API_URL}/filestatus_DB/Get</td>
+                <td class="method-get">GET</td>
+                <td class="description">Retrieves the latest processing status and metadata for a specific document by its ID</td>
+                <td>
+                    • <strong>documentId</strong> (string, required): The document identifier to check status for
+                </td>
+                <td class="payload">Query Parameters:
+?document_id=my-document.pdf</td>
+                <td>JSON object with document status, processing details, timestamps, etc.</td>
+                <td class="example">fileStatus("my-document.pdf")
+fileStatus("report-2024.xlsx")</td>
+                <td>200: Success<br>400: Bad Request (missing document_id)<br>401: Unauthorized<br>404: Document Not Found<br>500: Server Error</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Authentication</h2>
+    <p>All APIs require authentication headers provided by <code>getAuthHeaders()</code> function.</p>
+    
+    <h2>Base Configuration</h2>
+    <ul>
+        <li><strong>ENDAVA_API_URL</strong>: Base API URL from constants configuration</li>
+        <li><strong>Content-Type</strong>: application/json (for POST requests)</li>
+        <li><strong>Authentication</strong>: Bearer token via getAuthHeaders()</li>
+    </ul>
+
+    <h2>Common Error Handling</h2>
+    <p>All functions throw errors with descriptive messages when requests fail. Always wrap API calls in try-catch blocks.</p>
+</body>
+</html>

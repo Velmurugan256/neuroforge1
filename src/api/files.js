@@ -130,13 +130,14 @@ export const deleteFile = async (path, userId, userRole) => {
 }
 
 /** Rename a file */
+/** Rename a file */
 export const renameFile = async (oldPath, newPath, userId, userRole) => {
   if (!oldPath || !newPath || oldPath === newPath) throw new Error("Invalid rename paths")
   if (!userId || !userRole) throw new Error("User ID and role are required")
 
   const body = {
-    old_key: oldPath,
-    new_key: newPath,
+    source_key: oldPath,
+    target_key: newPath,
     user_id: userId,
     user_role: userRole,
   }
