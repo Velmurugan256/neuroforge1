@@ -6,7 +6,7 @@ const FOLDER_ROUTE = "/Folder_Handler"
 const extractPathAndName = (fullPath) => {
   const parts = fullPath.split("/").filter(Boolean)
   const folderName = parts.pop()
-  const folderPath = parts.join("/")
+  const folderPath = parts.length > 0 ? parts.join("/") : "/"
   return [folderPath, folderName]
 }
 

@@ -190,13 +190,7 @@ export default function RightPanelContainer() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setDetailsModalOpen(true)}
-                title="File Details"
-                className="bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-cyan-400 p-2 rounded-lg transition-all duration-200 border border-slate-700/50"
-              >
-                <Info className="w-4 h-4" />
-              </button>
+             
               <button
                 onClick={load}
                 title="Refresh"

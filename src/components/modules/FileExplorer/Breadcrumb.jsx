@@ -1,11 +1,19 @@
 const Breadcrumb = ({ pathArray = [] }) => {
-  if (pathArray.length === 0) return null
+  // Show "/" for root directory when no path
+  if (pathArray.length === 0) {
+    return (
+      <div className="text-gray-400 text-xs font-mono mb-2">
+        <span className="text-white">/</span>
+      </div>
+    )
+  }
 
   return (
     <div className="text-gray-400 text-xs font-mono mb-2">
+      <span className="text-white">/</span>
       {pathArray.map((crumb, i) => (
         <span key={i} className="text-white">
-          {i > 0 && " / "}
+          {" / "}
           {decodeURIComponent(crumb)}
         </span>
       ))}

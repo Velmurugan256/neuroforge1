@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { toast } from "sonner"
 import { fetchTreeData, createFolder, deleteFileOrFolder, setSelectedItem } from "@/store/slices/fileTreeSlice"
 import { createFileWithRefresh, uploadFileWithRefresh, renameFileWithRefresh, renameItemWithRefresh } from "@/store/actions/fileOperations"
+import { BUCKET } from "@/config/constants"
 import TreeView from "./TreeView"
 import Breadcrumb from "./Breadcrumb"
 import SideNavHeader from "./SideNavHeader"
@@ -46,6 +47,7 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
   }
 
   const handleConfirmCreateFolder = (newFolderName) => {
+    // Handle root folder path correctly
     const fullPath = modalParentPath ? `${modalParentPath}/${newFolderName}` : newFolderName
     dispatch(createFolder({ path: fullPath, userId, userRole }))
   }
@@ -117,11 +119,14 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
       <div className="h-full flex flex-col bg-slate-950 text-white border-r border-slate-800/50 min-h-0">
         <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent hover:scrollbar-thumb-slate-600 min-h-0">
           <SideNavHeader
-            onRefresh={() => dispatch(fetchTreeData())}
+            onRefresh={() => {
+              dispatch(fetchTreeData())
+              dispatch(setSelectedItem(null)) // Reset to root folder
+            }}
             loading={loading}
             onAddFolder={() => handleOpenCreateFolderModal(selectedItem || "")}
             onOpenPlayground={onOpenPlayground}
-            bucketName="neuroforge-dev-v-02"
+            bucketName={BUCKET}
           />
 
           <Breadcrumb pathArray={breadcrumb} />
