@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { createFile as apiCreateFile, uploadFile as apiUploadFile, renameFile as apiRenameFile } from '@/api'
+import { createFile as apiCreateFile, uploadFile as apiUploadFile, renameFile as apiRenameFile, renameItem as apiRenameItem } from '@/api'
 import { fetchTreeData } from '../slices/fileTreeSlice'
 import { fetchIngestionData } from '../slices/ingestionSlice'
 
@@ -43,6 +43,23 @@ export const renameFileWithRefresh = createAsyncThunk(
   async ({ oldPath, newPath, userId, userRole }, { dispatch, rejectWithValue }) => {
     try {
       const result = await apiRenameFile(oldPath, newPath, userId, userRole)
+      
+      // Automatically refresh both tree and ingestion data
+      dispatch(fetchTreeData())
+      dispatch(fetchIngestionData())
+      
+      return { oldPath, newPath, result }
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+export const renameItemWithRefresh = createAsyncThunk(
+  'fileOperations/renameItem',
+  async ({ oldPath, newPath }, { dispatch, rejectWithValue }) => {
+    try {
+      const result = await apiRenameItem(oldPath, newPath)
       
       // Automatically refresh both tree and ingestion data
       dispatch(fetchTreeData())

@@ -137,7 +137,8 @@ const ingestionSlice = createSlice({
           action.type.includes('fileTree/deleteFileOrFolder/fulfilled') ||
           action.type.endsWith('/uploadFile/fulfilled') ||
           action.type.endsWith('/createFile/fulfilled') ||
-          action.type.endsWith('/renameFile/fulfilled'),
+          action.type.endsWith('/renameFile/fulfilled') ||
+          action.type.endsWith('/renameItem/fulfilled'),
         (state) => {
           state.refreshTick += 1
         }

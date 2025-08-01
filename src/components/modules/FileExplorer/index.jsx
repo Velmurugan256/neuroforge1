@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { toast } from "sonner"
 import { fetchTreeData, createFolder, deleteFileOrFolder, setSelectedItem } from "@/store/slices/fileTreeSlice"
-import { createFileWithRefresh, uploadFileWithRefresh, renameFileWithRefresh } from "@/store/actions/fileOperations"
+import { createFileWithRefresh, uploadFileWithRefresh, renameFileWithRefresh, renameItemWithRefresh } from "@/store/actions/fileOperations"
 import TreeView from "./TreeView"
 import Breadcrumb from "./Breadcrumb"
 import SideNavHeader from "./SideNavHeader"
@@ -95,7 +95,17 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
   // --- Rename Logic ---
   const handleRename = async (oldPath, newPath) => {
     try {
-      await dispatch(renameFileWithRefresh({ oldPath, newPath, userId, userRole })).unwrap()
+      // Determine if it's a file or folder (consistent with useTreeData.js)
+      const isFile = oldPath.includes('.') && !oldPath.endsWith('/')
+      
+      if (isFile) {
+        // Use renameFile for files (requires user credentials)
+        await dispatch(renameFileWithRefresh({ oldPath, newPath, userId, userRole })).unwrap()
+      } else {
+        // Use renameItem for folders (no user credentials needed)
+        await dispatch(renameItemWithRefresh({ oldPath, newPath })).unwrap()
+      }
+      
       toast.success("Renamed successfully")
     } catch (err) {
       toast.error("Rename failed", { description: err.message })
