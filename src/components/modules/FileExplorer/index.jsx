@@ -121,7 +121,7 @@ const SideNav = ({ userId, userRole, onOpenDocument, onOpenPlayground }) => {
             loading={loading}
             onAddFolder={() => handleOpenCreateFolderModal(selectedItem || "")}
             onOpenPlayground={onOpenPlayground}
-            bucketName="Explorer"
+            bucketName="neuroforge-dev-v-02"
           />
 
           <Breadcrumb pathArray={breadcrumb} />
