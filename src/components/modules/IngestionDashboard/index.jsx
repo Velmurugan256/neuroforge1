@@ -9,7 +9,7 @@ import { fetchIngestionData, performNeuroSync, performNeuroWipe, setSyncTargets,
 import MultiDocumentDropdown from "./MultiDocumentDropdown"
 import ConfirmationModal from "@/components/ui/ConfirmationModal"
 import GetDetailsModal from "./GetDetailsModal"
-import { createCollection, deleteCollection, getCollectionsStatus } from "@/api/vector"
+import { createCollection, deleteCollection, getCollectionsStatus, createVector } from "@/api/vector"
 
 export default function RightPanelContainer() {
   const dispatch = useDispatch()

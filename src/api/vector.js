@@ -52,7 +52,7 @@ export const deleteCollection = async () => {
 }
 export const createVector = async () => {
     try {
-        const response = await fetch(`ENDAVA_API_URL/Collection_Create_Vector`, {
+        const response = await fetch(`${ENDAVA_API_URL}/Collection_Create_Vector`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
