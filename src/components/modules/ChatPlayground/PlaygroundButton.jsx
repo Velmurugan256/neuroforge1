@@ -10,7 +10,7 @@ const PlaygroundButton = ({ onToggle, isOpen }) => {
           ? "bg-red-600 hover:bg-red-500 shadow-red-500/30"
           : "bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-cyan-500/30"
       }`}
-      title={isOpen ? "Close Playground" : "Neurocache Playground"}
+  title={isOpen ? "Close Playground" : "NeuroForge Playground"}
     >
       <div className="flex items-center justify-center w-full h-full">
         {isOpen ? <X className="w-6 h-6 text-white" /> : <MessageCircle className="w-6 h-6 text-white" />}

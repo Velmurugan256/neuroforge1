@@ -4,7 +4,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["es2020", "dom"]   // 👈 Fixes the 'Promise' and browser globals
+    "lib": ["es2020", "dom"]
   },
   "exclude": ["node_modules", "dist"]
 }

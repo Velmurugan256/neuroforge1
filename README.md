@@ -96,6 +96,45 @@ src/
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
+## ☁️ Deploy to AWS (S3 + CloudFront)
+
+This repo includes infrastructure and scripts to host the Vite SPA behind CloudFront with a private S3 origin and SPA fallback.
+
+Prerequisites:
+- AWS CLI installed and configured (`aws configure`)
+- Permissions for CloudFormation, S3, and CloudFront
+
+One-time provision (creates S3 bucket + CloudFront with OAC):
+
+```bash
+npm run provision:cf -- <stack-name> <bucket-name> [region]
+# example:
+npm run provision:cf -- neuroforge-prod my-neuroforge-site us-east-1
+```
+
+Take note of the outputs printed (Distribution ID and Domain). Set env vars for deployment:
+
+```bash
+export S3_BUCKET=my-neuroforge-site
+export CF_DISTRIBUTION_ID=E123ABC456XYZ
+export REGION=us-east-1
+```
+
+Build and deploy:
+
+```bash
+npm run deploy:cf
+```
+
+What it does:
+- Builds the site to `dist/`
+- Syncs assets to S3 (immutable assets cached for 1 year)
+- Uploads `index.html` with no-cache
+- Invalidates CloudFront for `/index.html` and `/assets/*`
+
+Custom domains & HTTPS:
+- After the distribution is created, you can attach an ACM certificate (in us-east-1) and add your domain via Route53.
+
 ## 📄 License
 
 This project is proprietary software developed by Endava.
