@@ -1,14 +1,21 @@
 "use client"
-import { Navigate, useLocation } from "react-router-dom"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Loader2 } from "lucide-react"
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   
   // Check if we're in the middle of processing a Cognito callback
   const isAuthCallback = new URLSearchParams(location.search).has('code')
+
+  // If auth is already resolved and we're still on a callback URL, normalize to '/'
+  if (isAuthenticated && isAuthCallback) {
+    navigate("/", { replace: true })
+    return null
+  }
 
   if (isLoading || isAuthCallback) {
     return (

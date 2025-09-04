@@ -65,9 +65,8 @@ export const AuthProvider = ({ children }) => {
         
         console.log("🔧 User authenticated:", decodedUser.email || decodedUser.sub)
 
-        // Clean up the URL and navigate to the main page
-        window.history.replaceState({}, document.title, "/")
-        // Don't navigate here, let the useEffect handle the redirect
+  // Clean up the URL via react-router (ensures <ProtectedRoute/> sees updated location)
+  navigate("/", { replace: true })
       } catch (error) {
         console.error("Authentication callback failed:", error)
         // Don't call signOut here as it will cause a redirect loop
