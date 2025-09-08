@@ -1,8 +1,8 @@
-# NeuroForge
+# NeuroCore
 
-**NeuroForge** is an intelligent document management and analysis platform that leverages AI-powered RAG (Retrieval-Augmented Generation) technology to help organizations efficiently manage, process, and extract insights from their documents.
+**NeuroCore** is an intelligent document management and analysis platform that leverages AI-powered RAG (Retrieval-Augmented Generation) technology to help organizations efficiently manage, process, and extract insights from their documents.
 
-## 🚀 What NeuroForge Does
+## 🚀 What NeuroCore Does
 
 ### 📁 Smart Document Management
 - **File Explorer**: Intuitive file and folder management with realistic inline editing
@@ -141,4 +141,4 @@ This project is proprietary software developed by Endava.
 
 ---
 
-**NeuroForge** - Transforming document management through intelligent AI integration.
+**NeuroCore** - Transforming document management through intelligent AI integration.

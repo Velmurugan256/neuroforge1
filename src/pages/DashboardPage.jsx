@@ -126,7 +126,7 @@ function DashboardPage() {
               <Loader />
             </div>
             <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Welcome to NeuroForge
+              Welcome to NeuroCore
             </h1>
             <p className="text-slate-400 text-lg leading-relaxed mb-6">
               Select a file from the Explorer to begin working with your documents.

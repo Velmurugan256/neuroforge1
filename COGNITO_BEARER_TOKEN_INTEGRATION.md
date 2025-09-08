@@ -108,7 +108,7 @@ headers: { "Content-Type": "application/json", ...getAuthHeaders() }
 
 ## 🎉 **Integration Complete:**
 
-Your NeuroForge application now automatically includes the authenticated user's Cognito access token in every API call, providing proper authentication and authorization for all backend operations!
+Your NeuroCore application now automatically includes the authenticated user's Cognito access token in every API call, providing proper authentication and authorization for all backend operations!
 
 ## 🔧 **Testing:**
 

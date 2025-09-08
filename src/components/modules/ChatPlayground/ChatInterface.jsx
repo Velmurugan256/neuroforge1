@@ -11,7 +11,7 @@ const ChatInterface = ({ onClose }) => {
       id: 1,
       type: "bot",
       content:
-        "Hello! I'm your NeuroForge AI assistant. I can help you with document analysis, answer questions about your uploaded files, and assist with various tasks. What would you like to know?",
+        "Hello! I'm your NeuroCore AI assistant. I can help you with document analysis, answer questions about your uploaded files, and assist with various tasks. What would you like to know?",
       timestamp: new Date(),
     },
   ])

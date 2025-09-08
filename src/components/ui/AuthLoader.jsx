@@ -11,7 +11,7 @@ const AuthLoader = () => {
           <div />
         </div>
         <div className="ui-text">
-          NeuroForge
+          NeuroCore
           <div className="ui-dot" />
           <div className="ui-dot" />
           <div className="ui-dot" />

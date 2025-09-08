@@ -23,7 +23,7 @@ const LoginPage = () => {
           <span className="text-4xl">🧠</span>
         </div>
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-          Welcome to NeuroForge
+          Welcome to NeuroCore
         </h1>
         <p className="text-slate-400 text-lg leading-relaxed mb-8">
           Sign in to access your document intelligence dashboard.

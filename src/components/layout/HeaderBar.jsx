@@ -19,7 +19,7 @@ const HeaderBar = () => {
           </span>
         </div>
         <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-          NEUROFORGE
+          NEUROCORE
         </span>
       </div>
 

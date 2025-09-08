@@ -66,4 +66,4 @@ export const createFile = async (path, userId, userRole) => {
 
 ## 🎉 **Integration Complete:**
 
-The delete file functionality is now fully integrated into your NeuroForge application with proper user authentication and context-aware deletion handling!
+The delete file functionality is now fully integrated into your NeuroCore application with proper user authentication and context-aware deletion handling!
